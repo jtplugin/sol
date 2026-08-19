@@ -1,0 +1,46 @@
+{
+  "run_id": "w3-multi-call-task-router-i3-light-urgent-20260604T130528-r01",
+  "timestamp": "2026-06-04T13:05:28.020589+00:00",
+  "config": {
+    "fixture_id": "w3-multi-call/task-router",
+    "context": "E1",
+    "model_id": "claude-opus-4-8",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "native",
+    "predictability_layers": [],
+    "runner_type": "claude-code",
+    "api_base_url": null,
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i3-light-urgent",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 7237,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [
+      "[fixture-w3-task-router][assess-capacity] BRANCH: capacity-light",
+      "[fixture-w3-task-router][assess-urgency] BRANCH: urgency-urgent",
+      "[fixture-w3-task-router][main] BRANCH: branch-expedite"
+    ],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": []
+  },
+  "output": {
+    "raw": "[fixture-w3-task-router][assess-capacity] BRANCH: capacity-light\n[fixture-w3-task-router][assess-urgency] BRANCH: urgency-urgent\n[fixture-w3-task-router][main] BRANCH: branch-expedite\n\n{\"verdict\": \"EXPEDITE\"}",
+    "returned_payload": {
+      "verdict": "EXPEDITE"
+    }
+  },
+  "usage": {
+    "tokens_in": 1402,
+    "tokens_out": 294,
+    "cost": 0.026754999999999998,
+    "sub_agent_count": null
+  }
+}

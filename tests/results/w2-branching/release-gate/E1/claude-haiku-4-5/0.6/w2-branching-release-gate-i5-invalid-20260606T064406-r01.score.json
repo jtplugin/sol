@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i5-invalid-20260606T064406-r01",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i5-invalid",
+  "context": "E1",
+  "model_id": "claude-haiku-4-5",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "IF guard",
+    "observed_branch": "branch-guard"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "INVALID_INPUT",
+    "got": "INVALID_INPUT"
+  },
+  "efficiency": {
+    "wall_clock_ms": 10767,
+    "tokens_in": 15,
+    "tokens_out": 518,
+    "cost": 0.01937605
+  },
+  "degradation_mode": "none"
+}

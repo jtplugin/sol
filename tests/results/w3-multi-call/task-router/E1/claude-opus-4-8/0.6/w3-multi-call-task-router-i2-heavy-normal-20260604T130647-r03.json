@@ -1,0 +1,46 @@
+{
+  "run_id": "w3-multi-call-task-router-i2-heavy-normal-20260604T130647-r03",
+  "timestamp": "2026-06-04T13:06:47.382491+00:00",
+  "config": {
+    "fixture_id": "w3-multi-call/task-router",
+    "context": "E1",
+    "model_id": "claude-opus-4-8",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "native",
+    "predictability_layers": [],
+    "runner_type": "claude-code",
+    "api_base_url": null,
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i2-heavy-normal",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 8053,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [
+      "[fixture-w3-task-router][assess-capacity] BRANCH: capacity-heavy",
+      "[fixture-w3-task-router][assess-urgency] BRANCH: urgency-normal",
+      "[fixture-w3-task-router][main] BRANCH: branch-schedule"
+    ],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": []
+  },
+  "output": {
+    "raw": "[fixture-w3-task-router][assess-capacity] BRANCH: capacity-heavy\n[fixture-w3-task-router][assess-urgency] BRANCH: urgency-normal\n[fixture-w3-task-router][main] BRANCH: branch-schedule\n{\"verdict\": \"SCHEDULE\"}",
+    "returned_payload": {
+      "verdict": "SCHEDULE"
+    }
+  },
+  "usage": {
+    "tokens_in": 1403,
+    "tokens_out": 296,
+    "cost": 0.02680525,
+    "sub_agent_count": null
+  }
+}

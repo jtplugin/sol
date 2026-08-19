@@ -1,0 +1,377 @@
+{
+  "run_id": "w2-branching-support-intake-queue-01-20260819T051205-r01",
+  "fixture_id": "w2-branching/support-intake",
+  "staged_input_id": "queue-01",
+  "context": "E0",
+  "model_id": "ai-models/Ministral-3-8B-Instruct-2512-Q4_K_M.gguf",
+  "fidelity": {
+    "result": "fail",
+    "expected_branch": null,
+    "observed_branch": null,
+    "sequence_rate": 0.2857142857142857,
+    "expected_sequence": [
+      "item=item-241 action=ASSIGN",
+      "item=item-095 action=ASSIGN",
+      "item=item-299 action=ASSIGN",
+      "item=item-156 action=ASSIGN",
+      "item=item-105 action=ASSIGN",
+      "item=item-210 action=ASSIGN",
+      "item=item-137 action=ESCALATE"
+    ],
+    "observed_sequence": [
+      "item=item-241 action=ASSIGN",
+      "item=item-095 action=DEFER",
+      "item=item-299 action=ASSIGN",
+      "item=item-156 action=DEFER",
+      "item=item-105 action=DEFER",
+      "item=item-210 action=DEFER",
+      "item=item-137 action=DEFER",
+      "item=item-275 action=DEFER",
+      "item=item-128 action=DEFER",
+      "item=item-254 action=ESCALATE",
+      "item=item-181 action=DEFER",
+      "item=item-213 action=DEFER",
+      "item=item-271 action=DEFER",
+      "item=item-109 action=DEFER",
+      "item=item-160 action=DEFER"
+    ],
+    "conditional_rate": 0.2857142857142857,
+    "conditional_expected_sequence": [
+      "item=item-241 action=ASSIGN",
+      "item=item-095 action=ASSIGN",
+      "item=item-299 action=ASSIGN",
+      "item=item-156 action=ASSIGN",
+      "item=item-105 action=ASSIGN",
+      "item=item-210 action=ASSIGN",
+      "item=item-137 action=ESCALATE"
+    ],
+    "conditional_observed_sequence": [
+      "item=item-241 action=ASSIGN",
+      "item=item-095 action=DEFER",
+      "item=item-299 action=ASSIGN",
+      "item=item-156 action=DEFER",
+      "item=item-105 action=DEFER",
+      "item=item-210 action=DEFER",
+      "item=item-137 action=DEFER",
+      "item=item-275 action=DEFER",
+      "item=item-128 action=DEFER",
+      "item=item-254 action=ESCALATE",
+      "item=item-181 action=DEFER",
+      "item=item-213 action=DEFER",
+      "item=item-271 action=DEFER",
+      "item=item-109 action=DEFER",
+      "item=item-160 action=DEFER"
+    ]
+  },
+  "quality": {
+    "result": "fail",
+    "expected": {
+      "status": "OK",
+      "items": [
+        {
+          "id": "item-241",
+          "product": "P5",
+          "intent": "BUG",
+          "hours": 3,
+          "action": "ASSIGN"
+        },
+        {
+          "id": "item-095",
+          "product": "P2",
+          "intent": "FEATURE",
+          "hours": 4,
+          "action": "ASSIGN"
+        },
+        {
+          "id": "item-299",
+          "product": "P5",
+          "intent": "QUESTION",
+          "hours": 1,
+          "action": "ASSIGN"
+        },
+        {
+          "id": "item-156",
+          "product": "P3",
+          "intent": "FEATURE",
+          "hours": 4,
+          "action": "ASSIGN"
+        },
+        {
+          "id": "item-105",
+          "product": "P2",
+          "intent": "BUG",
+          "hours": 2,
+          "action": "ASSIGN"
+        },
+        {
+          "id": "item-210",
+          "product": "P4",
+          "intent": "FEATURE",
+          "hours": 5,
+          "action": "ASSIGN"
+        },
+        {
+          "id": "item-137",
+          "product": "P3",
+          "intent": "BUG",
+          "hours": 2,
+          "action": "ESCALATE"
+        }
+      ],
+      "remaining_hours": 1,
+      "halted_at": "item-137"
+    },
+    "got": {
+      "status": "OK",
+      "items": [
+        {
+          "id": "item-241",
+          "product": "P5",
+          "intent": "BUG",
+          "hours": 3,
+          "action": "ASSIGN"
+        },
+        {
+          "id": "item-095",
+          "product": "P2",
+          "intent": "FEATURE",
+          "hours": 4,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-299",
+          "product": "P5",
+          "intent": "QUESTION",
+          "hours": 1,
+          "action": "ASSIGN"
+        },
+        {
+          "id": "item-156",
+          "product": "P1",
+          "intent": "FEATURE",
+          "hours": 5,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-105",
+          "product": "P2",
+          "intent": "BUG",
+          "hours": 2,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-210",
+          "product": "P4",
+          "intent": "FEATURE",
+          "hours": 5,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-137",
+          "product": "P3",
+          "intent": "BUG",
+          "hours": 2,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-275",
+          "product": "P5",
+          "intent": "FEATURE",
+          "hours": 5,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-128",
+          "product": "P3",
+          "intent": "BUG",
+          "hours": 2,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-254",
+          "product": "P5",
+          "intent": "BUG",
+          "hours": 3,
+          "action": "ESCALATE"
+        },
+        {
+          "id": "item-181",
+          "product": "P4",
+          "intent": "BUG",
+          "hours": 3,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-213",
+          "product": "P4",
+          "intent": "FEATURE",
+          "hours": 5,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-271",
+          "product": "P5",
+          "intent": "FEATURE",
+          "hours": 5,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-109",
+          "product": "P2",
+          "intent": "QUESTION",
+          "hours": 1,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-160",
+          "product": "P3",
+          "intent": "FEATURE",
+          "hours": 4,
+          "action": "DEFER"
+        }
+      ],
+      "remaining_hours": 2,
+      "halted_at": "item-254"
+    },
+    "rate": null
+  },
+  "efficiency": {
+    "wall_clock_ms": 59857,
+    "tokens_in": 17467,
+    "tokens_out": 2140,
+    "cost": null
+  },
+  "degradation_mode": "no-halt",
+  "comprehension": {
+    "result": "fail",
+    "expected": [
+      {
+        "id": "item-241",
+        "product": "P5",
+        "intent": "BUG",
+        "tolerant": false,
+        "tolerant_alt_label": null
+      },
+      {
+        "id": "item-095",
+        "product": "P2",
+        "intent": "FEATURE",
+        "tolerant": false,
+        "tolerant_alt_label": null
+      },
+      {
+        "id": "item-299",
+        "product": "P5",
+        "intent": "QUESTION",
+        "tolerant": false,
+        "tolerant_alt_label": null
+      },
+      {
+        "id": "item-156",
+        "product": "P3",
+        "intent": "FEATURE",
+        "tolerant": false,
+        "tolerant_alt_label": null
+      },
+      {
+        "id": "item-105",
+        "product": "P2",
+        "intent": "BUG",
+        "tolerant": false,
+        "tolerant_alt_label": null
+      },
+      {
+        "id": "item-210",
+        "product": "P4",
+        "intent": "FEATURE",
+        "tolerant": false,
+        "tolerant_alt_label": null
+      },
+      {
+        "id": "item-137",
+        "product": "P3",
+        "intent": "BUG",
+        "tolerant": false,
+        "tolerant_alt_label": null
+      }
+    ],
+    "got": [
+      {
+        "id": "item-241",
+        "product": "P5",
+        "intent": "BUG"
+      },
+      {
+        "id": "item-095",
+        "product": "P2",
+        "intent": "FEATURE"
+      },
+      {
+        "id": "item-299",
+        "product": "P5",
+        "intent": "QUESTION"
+      },
+      {
+        "id": "item-156",
+        "product": "P1",
+        "intent": "FEATURE"
+      },
+      {
+        "id": "item-105",
+        "product": "P2",
+        "intent": "BUG"
+      },
+      {
+        "id": "item-210",
+        "product": "P4",
+        "intent": "FEATURE"
+      },
+      {
+        "id": "item-137",
+        "product": "P3",
+        "intent": "BUG"
+      },
+      {
+        "id": "item-275",
+        "product": "P5",
+        "intent": "FEATURE"
+      },
+      {
+        "id": "item-128",
+        "product": "P3",
+        "intent": "BUG"
+      },
+      {
+        "id": "item-254",
+        "product": "P5",
+        "intent": "BUG"
+      },
+      {
+        "id": "item-181",
+        "product": "P4",
+        "intent": "BUG"
+      },
+      {
+        "id": "item-213",
+        "product": "P4",
+        "intent": "FEATURE"
+      },
+      {
+        "id": "item-271",
+        "product": "P5",
+        "intent": "FEATURE"
+      },
+      {
+        "id": "item-109",
+        "product": "P2",
+        "intent": "QUESTION"
+      },
+      {
+        "id": "item-160",
+        "product": "P3",
+        "intent": "FEATURE"
+      }
+    ],
+    "rate": 0.8571428571428571
+  }
+}

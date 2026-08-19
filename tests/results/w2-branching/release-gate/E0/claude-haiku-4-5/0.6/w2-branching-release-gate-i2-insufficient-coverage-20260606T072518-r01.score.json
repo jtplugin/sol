@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i2-insufficient-coverage-20260606T072518-r01",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i2-insufficient-coverage",
+  "context": "E0",
+  "model_id": "claude-haiku-4-5",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "WHEN[1] coverage < 80",
+    "observed_branch": "branch-1"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "INSUFFICIENT_COVERAGE",
+    "got": "INSUFFICIENT_COVERAGE"
+  },
+  "efficiency": {
+    "wall_clock_ms": 3565,
+    "tokens_in": 696,
+    "tokens_out": 379,
+    "cost": null
+  },
+  "degradation_mode": "none"
+}

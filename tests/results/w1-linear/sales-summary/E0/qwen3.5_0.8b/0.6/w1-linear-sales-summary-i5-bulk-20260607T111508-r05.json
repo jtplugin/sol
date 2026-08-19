@@ -1,0 +1,50 @@
+{
+  "run_id": "w1-linear-sales-summary-i5-bulk-20260607T111508-r05",
+  "timestamp": "2026-06-07T11:15:08.533672+00:00",
+  "config": {
+    "fixture_id": "w1-linear/sales-summary",
+    "context": "E0",
+    "model_id": "qwen3.5:0.8b",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "api",
+    "api_base_url": "http://ollama-host:11434",
+    "backend": "ollama",
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i5-bulk",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 10658,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": [],
+    "request_messages": [
+      {
+        "role": "user",
+        "content": "# Sales summary task\n\nCompute the sales summary by executing strictly the SOL script below.\n\n## Notes content\n\n```\n01/06 - Rossi A. - articolo ref.001 - 15€\n01/06 - Bianchi G. - articolo ref.002 - 20€\n01/06 - Verdi M. - articolo ref.003 - 25€\n01/06 - Neri P. - articolo ref.004 - 30€\n01/06 - Esposito L. - articolo ref.005 - 35€\n02/06 - Russo F. - articolo ref.006 - 15€\n02/06 - Romano C. - articolo ref.007 - 20€\n02/06 - Colombo S. - articolo ref.008 - 25€\n02/06 - Ricci D. - articolo ref.009 - 30€\n02/06 - Marino T. - articolo ref.010 - 35€\n03/06 - Greco V. - articolo ref.011 - 15€\n03/06 - Bruno E. - articolo ref.012 - 20€\n03/06 - Gallo N. - articolo ref.013 - 25€\n03/06 - Conti R. - articolo ref.014 - 30€\n03/06 - De Luca B. - articolo ref.015 - 35€\n04/06 - Mancini I. - articolo ref.016 - 15€\n04/06 - Costa O. - articolo ref.017 - 20€\n04/06 - Giordano Q. - articolo ref.018 - 25€\n04/06 - Rizzo U. - articolo ref.019 - 30€\n04/06 - Lombardi H. - articolo ref.020 - 35€\n05/06 - Moreno K. - articolo ref.021 - 15€\n05/06 - Fontana J. - articolo ref.022 - 20€\n05/06 - Caruso W. - articolo ref.023 - 25€\n05/06 - Ferrari X. - articolo ref.024 - 30€\n05/06 - Gentile Y. - articolo ref.025 - 35€\n06/06 - Leone Z. - articolo ref.026 - 15€\n06/06 - Serra A. - articolo ref.027 - 20€\n06/06 - Conte B. - articolo ref.028 - 25€\n06/06 - Pellegrini C. - articolo ref.029 - 30€\n06/06 - Marchetti D. - articolo ref.030 - 35€\n07/06 - Parisi E. - articolo ref.031 - 15€\n07/06 - Palumbo F. - articolo ref.032 - 20€\n07/06 - Sanna G. - articolo ref.033 - 25€\n07/06 - Fabbri H. - articolo ref.034 - 30€\n07/06 - Vitale I. - articolo ref.035 - 35€\n08/06 - Orlando J. - articolo ref.036 - 15€\n08/06 - Ferraro K. - articolo ref.037 - 20€\n08/06 - Ferri L. - articolo ref.038 - 25€\n08/06 - Monti M. - articolo ref.039 - 30€\n08/06 - Sala N. - articolo ref.040 - 35€\n09/06 - De Angelis O. - articolo ref.041 - 15€\n09/06 - Gatti P. - articolo ref.042 - 20€\n09/06 - Rizzi Q. - articolo ref.043 - 25€\n09/06 - Cattaneo R. - articolo ref.044 - 30€\n09/06 - Martini S. - articolo ref.045 - 35€\n10/06 - Ruggiero T. - articolo ref.046 - 15€\n10/06 - Grassi U. - articolo ref.047 - 20€\n10/06 - D'Angelo V. - articolo ref.048 - 25€\n10/06 - Amato W. - articolo ref.049 - 30€\n10/06 - Silvestri X. - articolo ref.050 - 35€\n11/06 - Testa Y. - articolo ref.051 - 15€\n11/06 - Morano Z. - articolo ref.052 - 20€\n11/06 - Carbone A. - articolo ref.053 - 25€\n11/06 - Valentini B. - articolo ref.054 - 30€\n11/06 - Palmieri C. - articolo ref.055 - 35€\n12/06 - Piras D. - articolo ref.056 - 15€\n12/06 - Barone E. - articolo ref.057 - 20€\n12/06 - Pagano F. - articolo ref.058 - 25€\n12/06 - Santoro G. - articolo ref.059 - 30€\n12/06 - Ferretti H. - articolo ref.060 - 35€\n13/06 - Longo I. - articolo ref.061 - 15€\n13/06 - Mosca J. - articolo ref.062 - 20€\n13/06 - Cattani K. - articolo ref.063 - 25€\n13/06 - Villa L. - articolo ref.064 - 30€\n13/06 - Caputo M. - articolo ref.065 - 35€\n14/06 - Guerra N. - articolo ref.066 - 15€\n14/06 - Mele O. - articolo ref.067 - 20€\n14/06 - Coppola P. - articolo ref.068 - 25€\n14/06 - Benedetti Q. - articolo ref.069 - 30€\n14/06 - Sartori R. - articolo ref.070 - 35€\n15/06 - Bianco S. - articolo ref.071 - 15€\n15/06 - Farina T. - articolo ref.072 - 20€\n15/06 - Poli U. - articolo ref.073 - 25€\n15/06 - Mazza V. - articolo ref.074 - 30€\n15/06 - Fiore W. - articolo ref.075 - 35€\n16/06 - Pinto X. - articolo ref.076 - 15€\n16/06 - Donati Y. - articolo ref.077 - 20€\n16/06 - Sorrentino Z. - articolo ref.078 - 25€\n16/06 - Messina A. - articolo ref.079 - 30€\n16/06 - Rinaldi B. - articolo ref.080 - 35€\n17/06 - Ferrara C. - articolo ref.081 - 15€\n17/06 - Negri D. - articolo ref.082 - 20€\n17/06 - Marini E. - articolo ref.083 - 25€\n17/06 - Luca F. - articolo ref.084 - 30€\n17/06 - Riva G. - articolo ref.085 - 35€\n18/06 - Capone H. - articolo ref.086 - 15€\n18/06 - Penna I. - articolo ref.087 - 20€\n18/06 - Crespi J. - articolo ref.088 - 25€\n18/06 - Moretti K. - articolo ref.089 - 30€\n18/06 - Basso L. - articolo ref.090 - 35€\n19/06 - Napoli M. - articolo ref.091 - 15€\n19/06 - Angeli N. - articolo ref.092 - 20€\n19/06 - Pizzi O. - articolo ref.093 - 25€\n19/06 - Ruggeri P. - articolo ref.094 - 30€\n19/06 - Tedesco Q. - articolo ref.095 - 35€\n20/06 - Landi R. - articolo ref.096 - 15€\n20/06 - Spano S. - articolo ref.097 - 20€\n20/06 - Perna T. - articolo ref.098 - 25€\n20/06 - Milani U. - articolo ref.099 - 30€\n20/06 - Barbieri V. - articolo ref.100 - 35€\n\n```\n\n## SOL script\n\n```json\n{\n  \"ROUTINE\": [\n    {\"TODO\": \"Read the sales annotations from the notes block above.\"},\n    {\"TODO\": \"Set running_total to 0 and sale_count to 0.\"},\n    {\n      \"REPEAT\": {\n        \"foreach\": \"line in the notes block\",\n        \"ROUTINE\": [\n          {\"TODO\": \"Skip blank lines and header/separator lines with no monetary amount.\"},\n          {\"TODO\": \"If the line is marked as cancelled, annulled, voided, reversed, or storno (in any language or abbreviation), skip it — do not add its amount.\"},\n          {\"TODO\": \"Extract the monetary amount from the line. Amounts may appear as: '89€', 'EUR 89', '89 euro', '(89)', 'tot 89', or as arithmetic expressions like '35+38=73' or '2x45=90' — in the latter cases use the final computed value.\"},\n          {\"TODO\": \"Add the extracted amount to running_total.\"},\n          {\"TODO\": \"Increment sale_count by 1.\"}\n        ]\n      }\n    },\n    {\"TODO\": \"Build the result as JSON: {\\\"total\\\": <running_total as a JSON number>, \\\"count\\\": <sale_count as a JSON integer>}. No other fields. Exact key casing.\"},\n    {\"RETURN\": \"{{result}}\"}\n  ]\n}\n```"
+      }
+    ]
+  },
+  "output": {
+    "raw": "```json\n{\n  \"total\": 1200,\n  \"count\": 120\n}\n```",
+    "returned_payload": {
+      "total": 1200,
+      "count": 120
+    }
+  },
+  "usage": {
+    "tokens_in": 2670,
+    "tokens_out": 29,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}

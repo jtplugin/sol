@@ -1,0 +1,29 @@
+{
+  "run_id": "w2-branching-release-gate-i3-security-hold-20260606T053937-r02",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i3-security-hold",
+  "context": "E0",
+  "model_id": "qwen2.5-coder:7b",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": "WHEN[2] security_review != passed",
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "fail",
+    "expected": "SECURITY_HOLD",
+    "got": {
+      "TODO": "[fixture-w2-release-gate][main] BRANCH: branch-guard",
+      "RETURN": {
+        "verdict": "INVALID_INPUT"
+      }
+    }
+  },
+  "efficiency": {
+    "wall_clock_ms": 22567,
+    "tokens_in": 615,
+    "tokens_out": 43,
+    "cost": null
+  },
+  "degradation_mode": "garbled-output"
+}

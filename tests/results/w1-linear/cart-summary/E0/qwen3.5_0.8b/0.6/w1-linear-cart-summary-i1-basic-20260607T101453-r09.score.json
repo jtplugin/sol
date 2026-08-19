@@ -1,0 +1,30 @@
+{
+  "run_id": "w1-linear-cart-summary-i1-basic-20260607T101453-r09",
+  "fixture_id": "w1-linear/cart-summary",
+  "staged_input_id": "i1-basic",
+  "context": "E0",
+  "model_id": "qwen3.5:0.8b",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": null,
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "fail",
+    "expected": {
+      "total": 48,
+      "count": 4
+    },
+    "got": {
+      "total": 10,
+      "count": 4
+    }
+  },
+  "efficiency": {
+    "wall_clock_ms": 13606,
+    "tokens_in": 353,
+    "tokens_out": 14,
+    "cost": null
+  },
+  "degradation_mode": "wrong-value"
+}

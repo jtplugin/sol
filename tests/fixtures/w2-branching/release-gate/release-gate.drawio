@@ -1,0 +1,253 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="1IGXIoyXa5UcTW02X5z1" name="Pagina-1">
+    <mxGraphModel dx="2278" dy="386" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="START1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#475569;fontColor=#f8fafc;" value="▶ fixture-w2-release-gate" vertex="1">
+          <mxGeometry height="60" width="220" x="317.5857338820301" as="geometry" />
+        </mxCell>
+        <mxCell id="R2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontColor=#14532d;fontStyle=1;" value="RUN: cat {{record_path}}" vertex="1">
+          <mxGeometry height="60" width="220" x="317.5857338820301" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="C3" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef9c3;strokeColor=#ca8a04;fontColor=#713f12;" value="record_path was not provided, the file could not be re…" vertex="1">
+          <mxGeometry height="80" width="180" x="338.79286694101506" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="T4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;fontColor=#1e3a8a;" value="Emit verbatim: [fixture-w2-release-gate][main] BRANCH:…" vertex="1">
+          <mxGeometry height="60" width="220" x="250" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="RETURN5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#64748b;fontColor=#1e293b;" value="↩️ RETURN: {&#39;verdict&#39;: &#39;INVALID_INPUT&#39;}" vertex="1">
+          <mxGeometry height="60" width="220" x="250" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="T4" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="RETURN5" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="572" />
+              <mxPoint x="360" y="648" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="C3" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="T4" value="yes">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="386.29286694101506" y="412" />
+              <mxPoint x="360" y="488" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="M8" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#94a3b8;opacity=50;" value="" vertex="1">
+          <mxGeometry height="20" width="20" x="403.3024691358025" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="RETURN5" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="M8" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="732" />
+              <mxPoint x="408.3024691358025" y="808" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="C3" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="M8" value="no">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="471.29286694101506" y="412" />
+              <mxPoint x="500" y="450" />
+              <mxPoint x="500" y="610" />
+              <mxPoint x="500" y="610" />
+              <mxPoint x="500" y="770" />
+              <mxPoint x="418.3024691358025" y="808" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WC12" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef9c3;strokeColor=#ca8a04;fontColor=#713f12;" value="blocking_bugs is greater than 0" vertex="1">
+          <mxGeometry height="80" width="180" x="289.90740740740745" y="940" as="geometry" />
+        </mxCell>
+        <mxCell id="T13" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;fontColor=#1e3a8a;" value="Emit verbatim: [fixture-w2-release-gate][main] BRANCH:…" vertex="1">
+          <mxGeometry height="60" width="220" x="139.58333333333334" y="1130" as="geometry" />
+        </mxCell>
+        <mxCell id="RETURN14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#64748b;fontColor=#1e293b;" value="↩️ RETURN: {&#39;verdict&#39;: &#39;BLOCKED&#39;}" vertex="1">
+          <mxGeometry height="60" width="220" x="14.791666666666671" y="1310" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="T13" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="RETURN14" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="249.58333333333337" y="1212" />
+              <mxPoint x="124.79166666666667" y="1288" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="1" source="WC12" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="T13" value="yes">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="337.40740740740745" y="1032" />
+              <mxPoint x="249.58333333333337" y="1108" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e17" edge="1" parent="1" source="RETURN14" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="WM11" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="124.79166666666667" y="1392" />
+              <mxPoint y="1430" />
+              <mxPoint y="1590" />
+              <mxPoint y="1590" />
+              <mxPoint y="1750" />
+              <mxPoint x="202.76399999999998" y="1788" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WC18" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef9c3;strokeColor=#ca8a04;fontColor=#713f12;" value="coverage is below 80" vertex="1">
+          <mxGeometry height="80" width="180" x="389.58333333333337" y="1120" as="geometry" />
+        </mxCell>
+        <mxCell id="e19" edge="1" parent="1" source="WC12" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="WC18" value="no">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="422.40740740740745" y="1032" />
+              <mxPoint x="479.58333333333337" y="1108" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="T20" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;fontColor=#1e3a8a;" value="Emit verbatim: [fixture-w2-release-gate][main] BRANCH:…" vertex="1">
+          <mxGeometry height="60" width="220" x="264.7916666666667" y="1310" as="geometry" />
+        </mxCell>
+        <mxCell id="RETURN21" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#64748b;fontColor=#1e293b;" value="↩️ RETURN: {&#39;verdict&#39;: &#39;INSUFFICIENT_COVERAGE&#39;}" vertex="1">
+          <mxGeometry height="60" width="220" x="30" y="1480" as="geometry" />
+        </mxCell>
+        <mxCell id="e22" edge="1" parent="1" source="T20" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="RETURN21" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="374.7916666666667" y="1392" />
+              <mxPoint x="140" y="1468" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e23" edge="1" parent="1" source="WC18" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="T20" value="yes">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="437.08333333333337" y="1212" />
+              <mxPoint x="374.7916666666667" y="1288" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e24" edge="1" parent="1" source="RETURN21" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="WM11" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="140" y="1552" />
+              <mxPoint x="140" y="1590" />
+              <mxPoint x="140" y="1750" />
+              <mxPoint x="207.76399999999998" y="1786" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WC25" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef9c3;strokeColor=#ca8a04;fontColor=#713f12;" value="security_review is not &amp;quot;passed&amp;quot;" vertex="1">
+          <mxGeometry height="80" width="180" x="514.7916666666667" y="1300" as="geometry" />
+        </mxCell>
+        <mxCell id="e26" edge="1" parent="1" source="WC18" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="WC25" value="no">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="522.0833333333334" y="1212" />
+              <mxPoint x="604.7916666666667" y="1288" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="T27" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;fontColor=#1e3a8a;" value="Emit verbatim: [fixture-w2-release-gate][main] BRANCH:…" vertex="1">
+          <mxGeometry height="60" width="220" x="280" y="1480" as="geometry" />
+        </mxCell>
+        <mxCell id="RETURN28" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#64748b;fontColor=#1e293b;" value="↩️ RETURN: {&#39;verdict&#39;: &#39;SECURITY_HOLD&#39;}" vertex="1">
+          <mxGeometry height="60" width="220" x="170" y="1640" as="geometry" />
+        </mxCell>
+        <mxCell id="e29" edge="1" parent="1" source="T27" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="RETURN28" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="390" y="1552" />
+              <mxPoint x="280" y="1628" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e30" edge="1" parent="1" source="WC25" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="T27" value="yes">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="562.2916666666667" y="1392" />
+              <mxPoint x="390" y="1468" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e31" edge="1" parent="1" source="RETURN28" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="WM11" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="280" y="1712" />
+              <mxPoint x="212.76399999999998" y="1786" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="T32" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;fontColor=#1e3a8a;" value="Emit verbatim: [fixture-w2-release-gate][main] BRANCH:…" vertex="1">
+          <mxGeometry height="60" width="220" x="530" y="1480" as="geometry" />
+        </mxCell>
+        <mxCell id="RETURN33" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#64748b;fontColor=#1e293b;" value="↩️ RETURN: {&#39;verdict&#39;: &#39;READY&#39;}" vertex="1">
+          <mxGeometry height="60" width="220" x="420" y="1640" as="geometry" />
+        </mxCell>
+        <mxCell id="e34" edge="1" parent="1" source="T32" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="RETURN33" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="640" y="1552" />
+              <mxPoint x="530" y="1628" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e35" edge="1" parent="1" source="WC25" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="T32" value="no">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="647.2916666666667" y="1392" />
+              <mxPoint x="640" y="1468" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e36" edge="1" parent="1" source="RETURN33" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="WM11" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="530" y="1712" />
+              <mxPoint x="217.76399999999998" y="1788" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WM11" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#94a3b8;opacity=50;" value="" vertex="1">
+          <mxGeometry height="20" width="20" x="200.26399999999998" y="1800" as="geometry" />
+        </mxCell>
+        <mxCell id="e37" edge="1" parent="1" source="R2" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="C3" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="427.5857338820301" y="232" />
+              <mxPoint x="428.79286694101506" y="308" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e38" edge="1" parent="1" source="M8" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="WC12" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="413.3024691358025" y="852" />
+              <mxPoint x="379.90740740740745" y="928" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e39" edge="1" parent="1" source="START1" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="R2" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="427.5857338820301" y="72" />
+              <mxPoint x="427.5857338820301" y="148" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="END40" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#475569;fontColor=#f8fafc;" value="⏹ end" vertex="1">
+          <mxGeometry height="60" width="220" x="100.26399999999998" y="1920" as="geometry" />
+        </mxCell>
+        <mxCell id="e41" edge="1" parent="1" source="WM11" style="edgeStyle=none;html=1;rounded=0;noEdgeStyle=1;orthogonal=1;" target="END40" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="210.26399999999998" y="1832" />
+              <mxPoint x="210.264" y="1908" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

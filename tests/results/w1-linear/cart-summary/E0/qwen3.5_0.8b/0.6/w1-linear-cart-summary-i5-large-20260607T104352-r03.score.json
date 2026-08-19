@@ -1,0 +1,30 @@
+{
+  "run_id": "w1-linear-cart-summary-i5-large-20260607T104352-r03",
+  "fixture_id": "w1-linear/cart-summary",
+  "staged_input_id": "i5-large",
+  "context": "E0",
+  "model_id": "qwen3.5:0.8b",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": null,
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "fail",
+    "expected": {
+      "total": 340,
+      "count": 100
+    },
+    "got": {
+      "price": 2,
+      "name": "Bread"
+    }
+  },
+  "efficiency": {
+    "wall_clock_ms": 307972,
+    "tokens_in": 3110,
+    "tokens_out": 1053,
+    "cost": null
+  },
+  "degradation_mode": "wrong-value"
+}

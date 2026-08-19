@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i4-ready-20260604T124559-r05",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i4-ready",
+  "context": "E1",
+  "model_id": "claude-opus-4-8",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "WHEN.else",
+    "observed_branch": "branch-else"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "READY",
+    "got": "READY"
+  },
+  "efficiency": {
+    "wall_clock_ms": 6317,
+    "tokens_in": 1097,
+    "tokens_out": 209,
+    "cost": 0.0211125
+  },
+  "degradation_mode": "none"
+}

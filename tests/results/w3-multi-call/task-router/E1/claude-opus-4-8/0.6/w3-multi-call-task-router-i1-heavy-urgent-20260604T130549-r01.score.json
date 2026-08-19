@@ -1,0 +1,24 @@
+{
+  "run_id": "w3-multi-call-task-router-i1-heavy-urgent-20260604T130549-r01",
+  "fixture_id": "w3-multi-call/task-router",
+  "staged_input_id": "i1-heavy-urgent",
+  "context": "E1",
+  "model_id": "claude-opus-4-8",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": null,
+    "observed_branch": "branch-split"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "SPLIT",
+    "got": "SPLIT"
+  },
+  "efficiency": {
+    "wall_clock_ms": 8684,
+    "tokens_in": 1402,
+    "tokens_out": 277,
+    "cost": 0.02631675
+  },
+  "degradation_mode": "none"
+}

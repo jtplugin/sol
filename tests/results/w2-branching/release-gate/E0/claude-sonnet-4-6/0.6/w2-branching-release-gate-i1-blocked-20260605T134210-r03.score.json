@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i1-blocked-20260605T134210-r03",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i1-blocked",
+  "context": "E0",
+  "model_id": "claude-sonnet-4-6",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "WHEN[0] blocking_bugs > 0",
+    "observed_branch": "branch-0"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "BLOCKED",
+    "got": "BLOCKED"
+  },
+  "efficiency": {
+    "wall_clock_ms": 1629,
+    "tokens_in": 667,
+    "tokens_out": 29,
+    "cost": null
+  },
+  "degradation_mode": "none"
+}

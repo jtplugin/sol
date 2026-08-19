@@ -1,0 +1,34 @@
+{
+  "$schema": "../sol-schema.json",
+  "name": "daily-briefing",
+  "version": "1.0",
+  "description": "Generate a daily briefing from project status files. Run each morning before starting work.",
+  "ref": "https://github.com/jtplugin/sol",
+  "ROUTINE": [
+    { "TODO": "Read all status files in projects/" },
+    {
+      "WHEN": [
+        {
+          "when": "any project has overdue tasks",
+          "then": [{ "TODO": "List overdue items at the top with owner and original due date" }]
+        },
+        {
+          "when": "any project has a deadline within 3 days",
+          "then": [{ "TODO": "Add an upcoming deadlines section" }]
+        },
+        {
+          "when": "any project has been inactive for more than 7 days",
+          "then": [{ "TODO": "Flag stale projects for review" }]
+        }
+      ]
+    },
+    {
+      "TODO": "Summarize progress since yesterday for each active project",
+      "model": "fast"
+    },
+    {
+      "TODO": "Write the final briefing to output/daily-briefing.md",
+      "model": "smart"
+    }
+  ]
+}

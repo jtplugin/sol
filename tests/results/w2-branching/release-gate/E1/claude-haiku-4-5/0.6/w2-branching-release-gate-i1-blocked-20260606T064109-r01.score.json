@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i1-blocked-20260606T064109-r01",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i1-blocked",
+  "context": "E1",
+  "model_id": "claude-haiku-4-5",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "WHEN[0] blocking_bugs > 0",
+    "observed_branch": "branch-0"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "BLOCKED",
+    "got": "BLOCKED"
+  },
+  "efficiency": {
+    "wall_clock_ms": 9329,
+    "tokens_in": 15,
+    "tokens_out": 463,
+    "cost": 0.01909605
+  },
+  "degradation_mode": "none"
+}

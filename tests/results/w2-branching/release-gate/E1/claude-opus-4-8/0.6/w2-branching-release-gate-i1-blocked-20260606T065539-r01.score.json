@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i1-blocked-20260606T065539-r01",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i1-blocked",
+  "context": "E1",
+  "model_id": "claude-opus-4-8",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": "WHEN[0] blocking_bugs > 0",
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "not_checkable",
+    "expected": "BLOCKED",
+    "got": null
+  },
+  "efficiency": {
+    "wall_clock_ms": 70365,
+    "tokens_in": 66786,
+    "tokens_out": 3417,
+    "cost": null
+  },
+  "degradation_mode": "refused"
+}

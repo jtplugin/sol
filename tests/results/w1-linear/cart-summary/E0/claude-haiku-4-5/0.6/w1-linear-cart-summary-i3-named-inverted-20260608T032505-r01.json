@@ -1,0 +1,50 @@
+{
+  "run_id": "w1-linear-cart-summary-i3-named-inverted-20260608T032505-r01",
+  "timestamp": "2026-06-08T03:25:05.463701+00:00",
+  "config": {
+    "fixture_id": "w1-linear/cart-summary",
+    "context": "E0",
+    "model_id": "claude-haiku-4-5",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "api",
+    "api_base_url": "https://api.anthropic.com",
+    "backend": "anthropic",
+    "reasoning_budget": 4000
+  },
+  "staged_input_id": "i3-named-inverted",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 3933,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": [],
+    "request_messages": [
+      {
+        "role": "user",
+        "content": "# Aggregation task\n\nCompute the cart summary by executing strictly the SOL script below.\n\n## File content\n\n```json\n{\n  \"items\": [\n    {\n      \"name\": \"Apple\",\n      \"price\": \"4\"\n    },\n    {\n      \"price\": \"2\",\n      \"name\": \"Milk\"\n    },\n    {\n      \"name\": \"Bread\",\n      \"price\": \"3\"\n    },\n    {\n      \"price\": \"7\",\n      \"name\": \"Wine\"\n    },\n    {\n      \"name\": \"Tea\",\n      \"price\": \"1\"\n    },\n    {\n      \"price\": \"5\",\n      \"name\": \"Coffee\"\n    }\n  ]\n}\n```\n\n## SOL script\n\n```json\n{\n  \"ROUTINE\": [\n    {\"RUN\": \"cat {{record_path}}\"},\n    {\"TODO\": \"Read the 'items' array from the file content above.\"},\n    {\"TODO\": \"Set running_total to 0 and item_count to 0.\"},\n    {\n      \"REPEAT\": {\n        \"foreach\": \"item in the items array\",\n        \"ROUTINE\": [\n          {\"TODO\": \"Extract the value of the 'price' field from {{item}}.\"},\n          {\"TODO\": \"Add the extracted price to running_total.\"},\n          {\"TODO\": \"Increment item_count by 1.\"}\n        ]\n      }\n    },\n    {\"TODO\": \"Build the result as JSON: {\\\"total\\\": <running_total as a JSON number, not a string>, \\\"count\\\": <item_count as a JSON integer>}. No other fields. Respect exact key casing.\"},\n    {\"RETURN\": \"{{result}}\"}\n  ]\n}\n```"
+      }
+    ]
+  },
+  "output": {
+    "raw": "# Cart Summary Result\n\nExecuting the SOL script:\n\n**Step 1:** Read the 'items' array\n- 6 items found: Apple, Milk, Bread, Wine, Tea, Coffee\n\n**Step 2:** Initialize counters\n- running_total = 0\n- item_count = 0\n\n**Step 3:** Process each item\n\n| Item | Price | Running Total | Item Count |\n|------|-------|---------------|-----------|\n| Apple | 4 | 4 | 1 |\n| Milk | 2 | 6 | 2 |\n| Bread | 3 | 9 | 3 |\n| Wine | 7 | 16 | 4 |\n| Tea | 1 | 17 | 5 |\n| Coffee | 5 | 22 | 6 |\n\n**Step 4 & 5:** Build and return result\n\n```json\n{\"total\": 22, \"count\": 6}\n```",
+    "returned_payload": {
+      "total": 22,
+      "count": 6
+    }
+  },
+  "usage": {
+    "tokens_in": 474,
+    "tokens_out": 716,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}

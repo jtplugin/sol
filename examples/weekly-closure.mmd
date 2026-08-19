@@ -1,0 +1,75 @@
+%%{init: {'theme':'base','themeVariables':{'darkMode':false,'background':'#ffffff','primaryTextColor':'#1e293b','primaryColor':'#f8fafc','primaryBorderColor':'#64748b','lineColor':'#64748b','fontSize':'14px'}}}%%
+flowchart TD
+    %% Weekly project closure — run every Friday before 17:00. Reads all project status files, computes ve…
+
+    START1(["▶ weekly-closure"])
+    class START1 terminal
+    T2["Read all status.md files in projects/ [fast]"]
+    class T2 todo
+    R3["`RUN: python3 scripts/compute_velocity.py projects/`"]
+    class R3 run
+    ERR4["⚠ ONERROR"]
+    class ERR4 onerror
+    R3 -. error .-> ERR4
+    T5["Read reports/velocity.json [fast]"]
+    class T5 todo
+    LC6{"foreach: project in the projects/ directory"}
+    class LC6 ctrl
+    LE7(" ")
+    T8["Write the section for {{project}} in reports/weekly-su… [smart]"]
+    class T8 todo
+    C9{"{{project}} has velocity below 0.3 or has critical tas…"}
+    class C9 ctrl
+    M10(" ")
+    T11["Append an explicit alert note to {{project}}'s section…"]
+    class T11 todo
+    C9 -->|yes| T11
+    T11 --> M10
+    C9 -->|no| M10
+    T8 --> C9
+    LC6 -->|continue| T8
+    LC6 -->|exit| LE7
+    M10 --> LC6
+    T12["In todo.md, move all tasks that appear as closed in th… [fast]"]
+    class T12 todo
+    T13["In todo.md, add the priorities identified in the summa… [fast]"]
+    class T13 todo
+    T14["Prepare the email body from the content of reports/wee… [fast]"]
+    class T14 todo
+    C15{"at least one project has red status"}
+    class C15 ctrl
+    M16(" ")
+    T17["Prepend a bold alert line to the email body listing th…"]
+    class T17 todo
+    C15 -->|yes| T17
+    T17 --> M16
+    C15 -->|no| M16
+    T18["Send an email to team@company.com with subject 'Weekly…"]
+    class T18 todo
+    ERR19["⚠ ONERROR"]
+    class ERR19 onerror
+    T18 -. error .-> ERR19
+    T2 --> R3
+    R3 --> T5
+    T5 --> LC6
+    LE7 --> T12
+    T12 --> T13
+    T13 --> T14
+    T14 --> C15
+    M16 --> T18
+    START1 --> T2
+    END20(["⏹ end"])
+    class END20 terminal
+    T18 --> END20
+
+    classDef todo     fill:#dbeafe,stroke:#3b82f6,color:#1e3a8a
+    classDef run      fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef ctrl     fill:#fef9c3,stroke:#ca8a04,color:#713f12
+    classDef agent    fill:#f3e8ff,stroke:#9333ea,color:#3b0764
+    classDef terminal fill:#1e293b,stroke:#475569,color:#f8fafc
+    classDef onerror  fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+    classDef io       fill:#ffedd5,stroke:#ea580c,color:#7c2d12
+    classDef sub      fill:#f0fdf4,stroke:#16a34a,color:#14532d
+    classDef halt     fill:#450a0a,stroke:#dc2626,color:#fecaca
+    classDef return   fill:#e2e8f0,stroke:#64748b,color:#1e293b
+    classDef import   fill:#f1f5f9,stroke:#94a3b8,color:#334155

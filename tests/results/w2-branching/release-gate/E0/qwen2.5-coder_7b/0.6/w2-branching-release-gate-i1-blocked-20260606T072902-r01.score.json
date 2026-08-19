@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i1-blocked-20260606T072902-r01",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i1-blocked",
+  "context": "E0",
+  "model_id": "qwen2.5-coder:7b",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": "WHEN[0] blocking_bugs > 0",
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "BLOCKED",
+    "got": "BLOCKED"
+  },
+  "efficiency": {
+    "wall_clock_ms": 160783,
+    "tokens_in": 615,
+    "tokens_out": 16,
+    "cost": null
+  },
+  "degradation_mode": "none"
+}

@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i4-ready-20260606T064340-r02",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i4-ready",
+  "context": "E1",
+  "model_id": "claude-haiku-4-5",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "WHEN.else",
+    "observed_branch": "branch-else"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "READY",
+    "got": "READY"
+  },
+  "efficiency": {
+    "wall_clock_ms": 10175,
+    "tokens_in": 15,
+    "tokens_out": 666,
+    "cost": 0.0201148
+  },
+  "degradation_mode": "none"
+}

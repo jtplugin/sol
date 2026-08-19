@@ -1,0 +1,50 @@
+{
+  "run_id": "w1-linear-sales-summary-i3-corrections-20260608T040020-r01",
+  "timestamp": "2026-06-08T04:00:20.880903+00:00",
+  "config": {
+    "fixture_id": "w1-linear/sales-summary",
+    "context": "E0",
+    "model_id": "qwen3.5:9b",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "api",
+    "api_base_url": "http://ollama-host:11434",
+    "backend": "ollama",
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i3-corrections",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 167484,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": [],
+    "request_messages": [
+      {
+        "role": "user",
+        "content": "# Sales summary task\n\nCompute the sales summary by executing strictly the SOL script below.\n\n## Notes content\n\n```\nLun - Tonio A. - stivali 150€ ANNULLATO\nMar - Franca M. - borsa 95€\nMer - Aldo P. - occhiali 55€ STORNO (resa merce)\nGio - Renata G. - sciarpa 28€\nGio - Nino C. - portafoglio 42€\n\n```\n\n## SOL script\n\n```json\n{\n  \"ROUTINE\": [\n    {\"TODO\": \"Read the sales annotations from the notes block above.\"},\n    {\"TODO\": \"Set running_total to 0 and sale_count to 0.\"},\n    {\n      \"REPEAT\": {\n        \"foreach\": \"line in the notes block\",\n        \"ROUTINE\": [\n          {\"TODO\": \"Skip blank lines and header/separator lines with no monetary amount.\"},\n          {\"TODO\": \"If the line is marked as cancelled, annulled, voided, reversed, or storno (in any language or abbreviation), skip it — do not add its amount.\"},\n          {\"TODO\": \"Extract the monetary amount from the line. Amounts may appear as: '89€', 'EUR 89', '89 euro', '(89)', 'tot 89', or as arithmetic expressions like '35+38=73' or '2x45=90' — in the latter cases use the final computed value.\"},\n          {\"TODO\": \"Add the extracted amount to running_total.\"},\n          {\"TODO\": \"Increment sale_count by 1.\"}\n        ]\n      }\n    },\n    {\"TODO\": \"Build the result as JSON: {\\\"total\\\": <running_total as a JSON number>, \\\"count\\\": <sale_count as a JSON integer>}. No other fields. Exact key casing.\"},\n    {\"RETURN\": \"{{result}}\"}\n  ]\n}\n```"
+      }
+    ]
+  },
+  "output": {
+    "raw": "{\"total\": 225,\"count\": 4}",
+    "returned_payload": {
+      "total": 225,
+      "count": 4
+    }
+  },
+  "usage": {
+    "tokens_in": 471,
+    "tokens_out": 14,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}

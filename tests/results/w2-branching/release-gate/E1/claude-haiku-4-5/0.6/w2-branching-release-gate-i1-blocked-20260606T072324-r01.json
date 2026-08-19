@@ -1,0 +1,51 @@
+{
+  "run_id": "w2-branching-release-gate-i1-blocked-20260606T072324-r01",
+  "timestamp": "2026-06-06T07:23:24.258994+00:00",
+  "config": {
+    "fixture_id": "w2-branching/release-gate",
+    "context": "E1",
+    "model_id": "claude-haiku-4-5",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "api",
+    "api_base_url": "https://api.anthropic.com",
+    "backend": "anthropic",
+    "reasoning_budget": 4000
+  },
+  "staged_input_id": "i1-blocked",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 16540,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [
+      "[fixture-w2-release-gate][main] BRANCH: branch-X"
+    ],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": [],
+    "request_messages": [
+      {
+        "role": "user",
+        "content": "SOL. record_path=<staged\\i1-blocked>\n{\"$schema\": \"../../../../sol-schema.json\", \"name\": \"fixture-w2-release-gate\", \"version\": \"1.0\", \"description\": \"W2 branching-fidelity fixture. Reads a release record from a fixed file and classifies it into exactly one gate verdict. Each staged input is built so that exactly one branch is correct, so the returned verdict reveals which branch executed — that is the quality oracle. The per-branch trace TODOs emit a machine-readable BRANCH line so the checker can also verify fidelity.\", \"ref\": \"https://github.com/jtplugin/sol\", \"accepts\": {\"record_path\": {\"required\": true, \"desc\": \"path to a JSON release record staged by the runner; fields: coverage (number 0-100), blocking_bugs (integer >= 0), security_review (one of passed|pending|failed)\"}}, \"returns\": {\"verdict\": {\"anyof\": [\"BLOCKED\", \"INSUFFICIENT_COVERAGE\", \"SECURITY_HOLD\", \"READY\", \"INVALID_INPUT\"], \"required\": true, \"desc\": \"the single gate verdict; identifies the branch taken\"}}, \"ROUTINE\": [{\"RUN\": \"cat {{record_path}}\"}, {\"IF\": {\"when\": \"record_path was not provided, the file could not be read, or the record is missing any of coverage / blocking_bugs / security_review, or a field has the wrong type\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-guard\"}, {\"RETURN\": {\"verdict\": \"INVALID_INPUT\"}}]}}, {\"WHEN\": [{\"when\": \"blocking_bugs is greater than 0\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-0\"}, {\"RETURN\": {\"verdict\": \"BLOCKED\"}}]}, {\"when\": \"coverage is below 80\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-1\"}, {\"RETURN\": {\"verdict\": \"INSUFFICIENT_COVERAGE\"}}]}, {\"when\": \"security_review is not \\\"passed\\\"\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-2\"}, {\"RETURN\": {\"verdict\": \"SECURITY_HOLD\"}}]}, {\"else\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-else\"}, {\"RETURN\": {\"verdict\": \"READY\"}}]}]}]}\nTODO→verbatim. end: RETURN json. no markdown."
+      }
+    ]
+  },
+  "output": {
+    "raw": "Let me try with Windows command syntax:\nI apologize for the constraints. Based on the fixture specification provided and unable to access the actual record file, here is the expected output format once the record is successfully read:\n\n[fixture-w2-release-gate][main] BRANCH: branch-X\n{\"verdict\": \"VERDICT_NAME\"}\n\nWhere:\n- **branch-guard** → `{\"verdict\": \"INVALID_INPUT\"}` (if record missing/malformed)\n- **branch-0** → `{\"verdict\": \"BLOCKED\"}` (if blocking_bugs > 0)\n- **branch-1** → `{\"verdict\": \"INSUFFICIENT_COVERAGE\"}` (if coverage < 80)\n- **branch-2** → `{\"verdict\": \"SECURITY_HOLD\"}` (if security_review ≠ \"passed\")\n- **branch-else** → `{\"verdict\": \"READY\"}` (if all checks pass)\n\nTo proceed, could you either:\n1. Provide the contents of the record.json file, or\n2. Ensure the file path is accessible via standard shell commands?",
+    "returned_payload": {
+      "verdict": "VERDICT_NAME"
+    }
+  },
+  "usage": {
+    "tokens_in": 13689,
+    "tokens_out": 1113,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}

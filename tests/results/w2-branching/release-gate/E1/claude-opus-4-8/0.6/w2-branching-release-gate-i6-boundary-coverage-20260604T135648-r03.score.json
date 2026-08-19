@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i6-boundary-coverage-20260604T135648-r03",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i6-boundary-coverage",
+  "context": "E1",
+  "model_id": "claude-opus-4-8",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "WHEN.else",
+    "observed_branch": "branch-else"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "READY",
+    "got": "READY"
+  },
+  "efficiency": {
+    "wall_clock_ms": 6629,
+    "tokens_in": 1095,
+    "tokens_out": 199,
+    "cost": 0.020901249999999996
+  },
+  "degradation_mode": "none"
+}

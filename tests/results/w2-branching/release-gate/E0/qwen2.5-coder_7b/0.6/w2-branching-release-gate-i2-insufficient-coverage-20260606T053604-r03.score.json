@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i2-insufficient-coverage-20260606T053604-r03",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i2-insufficient-coverage",
+  "context": "E0",
+  "model_id": "qwen2.5-coder:7b",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": "WHEN[1] coverage < 80",
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "fail",
+    "expected": "INSUFFICIENT_COVERAGE",
+    "got": "READY"
+  },
+  "efficiency": {
+    "wall_clock_ms": 8056,
+    "tokens_in": 615,
+    "tokens_out": 15,
+    "cost": null
+  },
+  "degradation_mode": "wrong-branch"
+}

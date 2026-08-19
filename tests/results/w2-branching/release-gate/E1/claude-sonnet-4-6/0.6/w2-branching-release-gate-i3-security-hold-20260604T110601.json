@@ -1,0 +1,44 @@
+{
+  "run_id": "w2-branching-release-gate-i3-security-hold-20260604T110601",
+  "timestamp": "2026-06-04T11:06:01.072564+00:00",
+  "config": {
+    "fixture_id": "w2-branching/release-gate",
+    "context": "E1",
+    "model_id": "claude-sonnet-4-6",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "claude-code",
+    "api_base_url": null,
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i3-security-hold",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 0,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [
+      "[fixture-w2-release-gate][main] BRANCH: branch-2"
+    ],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": []
+  },
+  "output": {
+    "raw": "[fixture-w2-release-gate][main] BRANCH: branch-2\n{\"verdict\": \"SECURITY_HOLD\"}",
+    "returned_payload": {
+      "verdict": "SECURITY_HOLD"
+    }
+  },
+  "usage": {
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}

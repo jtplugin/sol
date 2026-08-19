@@ -1,0 +1,58 @@
+{
+  "fixture": "fixture-w3-task-router",
+  "workload_class": "W3",
+  "concern": "multi-call composition — two SUBs produce intermediate classifications, main WHEN routes on their product",
+  "min_environment": "E1",
+  "fidelity_oracle": "last BRANCH trace line in the output — must match the main WHEN branch label (sub-routine BRANCH lines appear first and are informational)",
+  "cases": [
+    {
+      "input": "inputs/i1-heavy-urgent.json",
+      "trace_branch_label": "branch-split",
+      "rationale": "effort_days=8 (>5 → HEAVY) and deadline_days=2 (<=3 → URGENT) → SPLIT",
+      "expected_output": {
+        "verdict": "SPLIT"
+      }
+    },
+    {
+      "input": "inputs/i2-heavy-normal.json",
+      "trace_branch_label": "branch-schedule",
+      "rationale": "effort_days=8 (>5 → HEAVY) and deadline_days=7 (>3 → NORMAL) → SCHEDULE",
+      "expected_output": {
+        "verdict": "SCHEDULE"
+      }
+    },
+    {
+      "input": "inputs/i3-light-urgent.json",
+      "trace_branch_label": "branch-expedite",
+      "rationale": "effort_days=2 (<=5 → LIGHT) and deadline_days=1 (<=3 → URGENT) → EXPEDITE",
+      "expected_output": {
+        "verdict": "EXPEDITE"
+      }
+    },
+    {
+      "input": "inputs/i4-light-normal.json",
+      "trace_branch_label": "branch-queue",
+      "rationale": "effort_days=3 (<=5 → LIGHT) and deadline_days=10 (>3 → NORMAL) → QUEUE",
+      "expected_output": {
+        "verdict": "QUEUE"
+      }
+    },
+    {
+      "input": "inputs/i5-invalid.json",
+      "trace_branch_label": "branch-guard",
+      "rationale": "effort_days is a string and deadline_days is negative — the guard must fire before the SUBs are called",
+      "expected_output": {
+        "verdict": "INVALID_INPUT"
+      }
+    },
+    {
+      "input": "inputs/i6-boundary-exact.json",
+      "trace_branch_label": "branch-expedite",
+      "rationale": "effort_days=5 is NOT greater than 5 (strict inequality) → LIGHT; deadline_days=3 IS <=3 → URGENT; combined: EXPEDITE. Model handles strict inequalities correctly at exact boundary values: 5/5 EXPEDITE.",
+      "expected_output": {
+        "verdict": "EXPEDITE"
+      }
+    }
+  ],
+  "negative_design": "the 2×2 capacity×urgency grid yields four mutually distinct verdicts; misclassification in either SUB propagates into the wrong final branch"
+}

@@ -1,0 +1,517 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/jtplugin/sol/sol-schema.json",
+  "title": "SOL Process",
+  "description": "Simple Orchestration Language — line v0.6",
+  "type": "object",
+  "required": ["name", "version", "description", "ROUTINE"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference for editor support."
+    },
+    "name": {
+      "type": "string",
+      "description": "Process identifier."
+    },
+    "version": {
+      "type": "string",
+      "description": "Process version."
+    },
+    "description": {
+      "type": "string",
+      "description": "Scope and context. The agent reads this before executing."
+    },
+    "ref": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL of the published spec."
+    },
+    "env": {
+      "type": "string",
+      "description": "Working directory for RUN commands. Default: root."
+    },
+    "model": { "$ref": "#/$defs/model" },
+    "role": {
+      "type": "string",
+      "description": "Persona the agent adopts for this process. Inherited by nested scopes."
+    },
+    "accepts": {
+      "$ref": "#/$defs/contract",
+      "description": "Entry contract — what this process expects from whoever invokes it. String (open) or structured object (a map of field name to constraints)."
+    },
+    "returns": {
+      "$ref": "#/$defs/contract",
+      "description": "Exit contract — what this process produces for its invoker. String (open) or structured object."
+    },
+    "ONERROR": {
+      "$ref": "#/$defs/routine",
+      "description": "Global error handler. Executed when a local ONERROR is absent."
+    },
+    "ROUTINE": {
+      "$ref": "#/$defs/routine",
+      "description": "Ordered list of instructions. The agent reads the entire ROUTINE before executing."
+    }
+  },
+
+  "$defs": {
+
+    "model": {
+      "type": "string",
+      "enum": ["fast", "balanced", "smart"],
+      "description": "Model tier for this scope. Nearest scope takes precedence (inner overrides outer). Use an exact model ID string (e.g. claude-opus-4-7) for version pinning — validation will warn, but execution is valid."
+    },
+
+    "contract": {
+      "description": "Input/output contract across a context boundary. Either a natural-language string (open contract) or a structured object mapping field names to their constraints (structured contract). Honored by the receiving agent, not by a runtime type checker.",
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Open contract — natural-language description of what crosses the boundary."
+        },
+        {
+          "type": "object",
+          "description": "Structured contract — a map of field name to its constraints.",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/contractField" }
+        }
+      ]
+    },
+
+    "contractField": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "A contract field: a set of optional, composable constraints. Omit all for a free-form field whose meaning is carried by desc.",
+      "properties": {
+        "desc": {
+          "type": "string",
+          "description": "What the field carries, in natural language. The semantic payload — always lives here, whatever the other constraints."
+        },
+        "required": {
+          "type": "boolean",
+          "description": "The field must be present. Absent means false."
+        },
+        "anyof": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Closed set of admissible values. The value must be one of these. Use when a downstream branch depends on the value."
+        },
+        "number": {
+          "const": true,
+          "description": "The value must be numeric (covers booleans). Set to true."
+        },
+        "json": {
+          "const": true,
+          "description": "The value must be valid, parseable JSON, so the receiver can parse it instead of interpreting it. Set to true."
+        }
+      }
+    },
+
+    "routine": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/instruction" },
+      "description": "Ordered list of instructions."
+    },
+
+    "instruction": {
+      "type": "object",
+      "oneOf": [
+        { "$ref": "#/$defs/todo" },
+        { "$ref": "#/$defs/run" },
+        { "$ref": "#/$defs/if" },
+        { "$ref": "#/$defs/when" },
+        { "$ref": "#/$defs/repeat" },
+        { "$ref": "#/$defs/sub" },
+        { "$ref": "#/$defs/call" },
+        { "$ref": "#/$defs/import" },
+        { "$ref": "#/$defs/return" },
+        { "$ref": "#/$defs/halt" },
+        { "$ref": "#/$defs/waituserinput" },
+        { "$ref": "#/$defs/delegate" },
+        { "$ref": "#/$defs/agent" },
+        { "$ref": "#/$defs/spawn" }
+      ]
+    },
+
+    "todo": {
+      "description": "Natural language instruction. The agent interprets and executes it in context.",
+      "type": "object",
+      "required": ["TODO"],
+      "additionalProperties": false,
+      "properties": {
+        "TODO": {
+          "type": "string",
+          "description": "The instruction for the agent to interpret and execute."
+        },
+        "model": { "$ref": "#/$defs/model" },
+        "ONERROR": {
+          "$ref": "#/$defs/routine",
+          "description": "Local error handler. Executed on unexpected results."
+        }
+      }
+    },
+
+    "run": {
+      "description": "Executes a command verbatim. Use {{placeholder}} for parts the agent must resolve from context. Everything outside {{...}} is passed as written.",
+      "type": "object",
+      "required": ["RUN"],
+      "additionalProperties": false,
+      "properties": {
+        "RUN": {
+          "type": "string",
+          "description": "Command to execute verbatim. Use {{placeholder}} for dynamic parts."
+        },
+        "model": { "$ref": "#/$defs/model" },
+        "ONERROR": {
+          "$ref": "#/$defs/routine",
+          "description": "Local error handler. Executed on non-trivial failures after one retry."
+        }
+      }
+    },
+
+    "if": {
+      "description": "Binary conditional. Use for decisions with two outcomes. For multi-branch use WHEN (mutually exclusive) or sequential IF blocks (overlapping conditions).",
+      "type": "object",
+      "required": ["IF"],
+      "additionalProperties": false,
+      "properties": {
+        "IF": {
+          "type": "object",
+          "required": ["when", "then"],
+          "additionalProperties": false,
+          "properties": {
+            "when": {
+              "type": "string",
+              "description": "Condition to evaluate."
+            },
+            "then": {
+              "$ref": "#/$defs/routine",
+              "description": "Instructions executed when condition is true."
+            },
+            "else": {
+              "$ref": "#/$defs/routine",
+              "description": "Instructions executed when condition is false. Optional."
+            }
+          }
+        },
+        "model": { "$ref": "#/$defs/model" },
+        "ONERROR": { "$ref": "#/$defs/routine" }
+      }
+    },
+
+    "when": {
+      "description": "Multi-branch conditional. Evaluates all conditions and executes matching branches. Safe when conditions are mutually exclusive. For overlapping conditions, use sequential IF blocks instead.",
+      "type": "object",
+      "required": ["WHEN"],
+      "additionalProperties": false,
+      "properties": {
+        "WHEN": {
+          "type": "array",
+          "description": "List of condition branches. Optional trailing else branch executes when no when matched.",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "required": ["when", "then"],
+                "additionalProperties": false,
+                "properties": {
+                  "when": {
+                    "type": "string",
+                    "description": "Condition to evaluate."
+                  },
+                  "then": {
+                    "$ref": "#/$defs/routine",
+                    "description": "Instructions executed when condition is true."
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "required": ["else"],
+                "additionalProperties": false,
+                "properties": {
+                  "else": {
+                    "$ref": "#/$defs/routine",
+                    "description": "Executed only if no when branch matched."
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "model": { "$ref": "#/$defs/model" },
+        "ONERROR": { "$ref": "#/$defs/routine" }
+      }
+    },
+
+    "repeat": {
+      "description": "Loop construct. Exactly one of while, until, for, foreach must be specified.",
+      "type": "object",
+      "required": ["REPEAT"],
+      "additionalProperties": false,
+      "properties": {
+        "REPEAT": {
+          "type": "object",
+          "required": ["ROUTINE"],
+          "additionalProperties": false,
+          "properties": {
+            "while": {
+              "type": "string",
+              "description": "Execute while condition is true."
+            },
+            "until": {
+              "type": "string",
+              "description": "Execute until condition becomes true."
+            },
+            "for": {
+              "type": "string",
+              "description": "Execute N times."
+            },
+            "foreach": {
+              "type": "string",
+              "description": "Execute for each element of the target."
+            },
+            "ROUTINE": {
+              "$ref": "#/$defs/routine",
+              "description": "Instructions to repeat."
+            }
+          },
+          "oneOf": [
+            { "required": ["while"] },
+            { "required": ["until"] },
+            { "required": ["for"] },
+            { "required": ["foreach"] }
+          ]
+        },
+        "model": { "$ref": "#/$defs/model" },
+        "ONERROR": { "$ref": "#/$defs/routine" }
+      }
+    },
+
+    "sub": {
+      "description": "Subroutine definition. Can appear anywhere in ROUTINE — the agent reads the entire document first, so definition order does not matter. Invoked via CALL.",
+      "type": "object",
+      "required": ["SUB"],
+      "additionalProperties": false,
+      "properties": {
+        "SUB": {
+          "type": "object",
+          "required": ["name", "ROUTINE"],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Subroutine identifier. Used by CALL."
+            },
+            "model": { "$ref": "#/$defs/model" },
+            "role": {
+              "type": "string",
+              "description": "Persona for this subroutine scope. Overrides outer role."
+            },
+            "ROUTINE": {
+              "$ref": "#/$defs/routine",
+              "description": "Instructions of the subroutine."
+            }
+          }
+        }
+      }
+    },
+
+    "call": {
+      "description": "Invokes a SUB defined in the same file.",
+      "type": "object",
+      "required": ["CALL"],
+      "additionalProperties": false,
+      "properties": {
+        "CALL": {
+          "type": "string",
+          "description": "Name of the SUB to invoke."
+        },
+        "model": { "$ref": "#/$defs/model" },
+        "ONERROR": { "$ref": "#/$defs/routine" }
+      }
+    },
+
+    "import": {
+      "description": "Imports definitions from an external SOL file. After declaration, its SUB definitions are available via CALL and its AGENT definitions are available via SPAWN.",
+      "type": "object",
+      "required": ["IMPORT"],
+      "additionalProperties": false,
+      "properties": {
+        "IMPORT": {
+          "type": "string",
+          "description": "Path to the external SOL file to import SUBs from."
+        }
+      }
+    },
+
+    "return": {
+      "description": "Ends the current process cleanly and yields control back to its invoker. Does not end the executing agent. The common way to finish early. Distinct from HALT (global stop) and ONERROR (failure).",
+      "type": "object",
+      "required": ["RETURN"],
+      "additionalProperties": false,
+      "properties": {
+        "RETURN": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Result yielded to the invoker; satisfies the 'returns' contract when one is declared."
+            },
+            {
+              "type": "null",
+              "description": "Return without a surfaced value."
+            },
+            {
+              "type": "object",
+              "description": "Structured payload echoing the keys of a structured returns contract.",
+              "additionalProperties": true
+            }
+          ]
+        }
+      }
+    },
+
+    "halt": {
+      "description": "The red button: immediately stops the entire run, agent session included. No further instructions execute at any level and control is NOT handed back to an invoker. Global, intentional termination — not an error response. Distinct from RETURN (yields upward) and ONERROR.",
+      "type": "object",
+      "required": ["HALT"],
+      "additionalProperties": false,
+      "properties": {
+        "HALT": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Message surfaced before stopping."
+            },
+            {
+              "type": "null",
+              "description": "Stop silently."
+            }
+          ]
+        }
+      }
+    },
+
+    "waituserinput": {
+      "description": "Pauses execution and prompts the user for input. In non-interactive contexts (automated pipelines), halts with the prompt text rather than blocking.",
+      "type": "object",
+      "required": ["WAITUSERINPUT"],
+      "additionalProperties": false,
+      "properties": {
+        "WAITUSERINPUT": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Prompt displayed to the user. Required — a blank prompt is not meaningful."
+        },
+        "model": { "$ref": "#/$defs/model" },
+        "ONERROR": { "$ref": "#/$defs/routine" }
+      }
+    },
+
+    "agent": {
+      "description": "Named agent definition with an explicit context boundary. Can appear anywhere in ROUTINE. Invoked via SPAWN.",
+      "type": "object",
+      "required": ["AGENT"],
+      "additionalProperties": false,
+      "properties": {
+        "AGENT": {
+          "type": "object",
+          "required": ["name", "ROUTINE"],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Agent identifier. Used by SPAWN."
+            },
+            "description": {
+              "type": "string",
+              "description": "What the agent does and when to use it."
+            },
+            "model": { "$ref": "#/$defs/model" },
+            "role": {
+              "type": "string",
+              "description": "Persona the agent adopts."
+            },
+            "accepts": {
+              "$ref": "#/$defs/contract",
+              "description": "Input contract — what the caller should pass via with. String (open) or structured object."
+            },
+            "returns": {
+              "$ref": "#/$defs/contract",
+              "description": "Output contract — what the agent produces. Available to the calling agent as context after SPAWN completes."
+            },
+            "ROUTINE": {
+              "$ref": "#/$defs/routine",
+              "description": "The agent's instructions."
+            }
+          }
+        }
+      }
+    },
+
+    "spawn": {
+      "description": "Invokes a named AGENT in a separate context. `with` seeds the agent's context; `returns` overrides the agent-level default for this call.",
+      "type": "object",
+      "required": ["SPAWN"],
+      "additionalProperties": false,
+      "properties": {
+        "SPAWN": {
+          "type": "string",
+          "description": "Name of the AGENT to invoke."
+        },
+        "with": {
+          "type": "string",
+          "description": "Information to extract from the current context and pass to the agent. If omitted, the agent relies on its own description and accepts field."
+        },
+        "returns": {
+          "$ref": "#/$defs/contract",
+          "description": "Overrides AGENT.returns for this invocation. String (open) or structured object. Available to subsequent instructions as context."
+        },
+        "model": { "$ref": "#/$defs/model" },
+        "ONERROR": {
+          "$ref": "#/$defs/routine",
+          "description": "Handler executed if the agent fails or returns nothing useful."
+        }
+      }
+    },
+
+    "delegate": {
+      "description": "Spawns a sub-agent with an explicit context boundary. Distinct from CALL: DELEGATE creates a separate context; CALL shares the current one.",
+      "type": "object",
+      "required": ["DELEGATE"],
+      "additionalProperties": false,
+      "properties": {
+        "DELEGATE": {
+          "type": "object",
+          "required": ["task"],
+          "additionalProperties": false,
+          "properties": {
+            "task": {
+              "type": "string",
+              "description": "What the sub-agent must accomplish — natural language."
+            },
+            "model": { "$ref": "#/$defs/model" },
+            "role": {
+              "type": "string",
+              "description": "Persona the sub-agent adopts."
+            },
+            "with": {
+              "type": "string",
+              "description": "Information to extract from the current context and pass to the sub-agent. Omit to start the sub-agent from task alone."
+            },
+            "returns": {
+              "$ref": "#/$defs/contract",
+              "description": "What the sub-agent should produce. String (open) or structured object. Available to subsequent instructions as context. Omit when the result is observable by other means (a written file, a sent message)."
+            },
+            "ONERROR": {
+              "$ref": "#/$defs/routine",
+              "description": "Handler executed if the sub-agent fails or returns nothing useful."
+            }
+          }
+        }
+      }
+    }
+
+  }
+}

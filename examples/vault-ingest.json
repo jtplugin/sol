@@ -1,0 +1,46 @@
+{
+  "$schema": "../sol-schema.json",
+  "name": "vault-ingest",
+  "version": "1.0",
+  "description": "Process files staged in raw/ and entries in ingest-queue.json. Updates wiki pages with extracted concepts, decisions, and next steps. Appends to log.md for each processed item.",
+  "ref": "https://github.com/jtplugin/sol",
+  "env": "agentic-os/src/",
+  "ONERROR": [
+    { "TODO": "Log error to log.md and halt" }
+  ],
+  "ROUTINE": [
+    {
+      "RUN": "main.py vault-scan {{repository}}",
+      "ONERROR": [
+        { "TODO": "Log error line by line in daily-briefing.md and continue" }
+      ]
+    },
+    {
+      "IF": {
+        "when": "queue is empty",
+        "then": [{ "TODO": "Halt" }]
+      }
+    },
+    {
+      "REPEAT": {
+        "foreach": "entry in queue (max 5, sorted by detected desc)",
+        "ROUTINE": [
+          { "CALL": "process-entry" }
+        ]
+      }
+    },
+    {
+      "SUB": {
+        "name": "process-entry",
+        "model": "smart",
+        "ROUTINE": [
+          { "TODO": "Fetch content via GitHub API" },
+          { "TODO": "Identify target wiki page by identity and initiative" },
+          { "TODO": "Extract: decisions, status, changelog, next steps" },
+          { "TODO": "Update wiki page section" },
+          { "TODO": "Append to log.md" }
+        ]
+      }
+    }
+  ]
+}

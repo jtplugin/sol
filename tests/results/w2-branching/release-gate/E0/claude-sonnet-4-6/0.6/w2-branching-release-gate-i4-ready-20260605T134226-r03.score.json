@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i4-ready-20260605T134226-r03",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i4-ready",
+  "context": "E0",
+  "model_id": "claude-sonnet-4-6",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "WHEN.else",
+    "observed_branch": "branch-else"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "READY",
+    "got": "READY"
+  },
+  "efficiency": {
+    "wall_clock_ms": 1732,
+    "tokens_in": 667,
+    "tokens_out": 29,
+    "cost": null
+  },
+  "degradation_mode": "none"
+}

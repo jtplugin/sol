@@ -1,0 +1,46 @@
+{
+  "_comment": "Frozen fixture data (SS8.1 of doc/experiment-minimum-context.md). Product personas map 1:1 onto the five NLBSE'24 repos, deterministically, alphabetically by repo full name. The mapping and the real repo name are NEVER shown to the model -- only the product persona below. The mapping itself is used offline by build_queues.py / expectations generation to compute ground truth, and by hydrate.py to check the model's classification against it.",
+  "product_to_repo": {
+    "P1": "bitcoin/bitcoin",
+    "P2": "facebook/react",
+    "P3": "microsoft/vscode",
+    "P4": "opencv/opencv",
+    "P5": "tensorflow/tensorflow"
+  },
+  "products": [
+    {
+      "id": "P1",
+      "name": "Solidus",
+      "persona": "a cryptocurrency full-node and wallet client: consensus rules, peer-to-peer networking, transaction relay, wallet key management."
+    },
+    {
+      "id": "P2",
+      "name": "Lucent",
+      "persona": "a JavaScript library for building user interfaces: component rendering, the virtual DOM, hooks, server-side rendering."
+    },
+    {
+      "id": "P3",
+      "name": "Meridian",
+      "persona": "a cross-platform source code editor: the text-editing core, extensions/plugins, debugging integration, the integrated terminal."
+    },
+    {
+      "id": "P4",
+      "name": "Aperture",
+      "persona": "a computer-vision and image-processing library: image I/O, filters and transforms, camera calibration, video analysis."
+    },
+    {
+      "id": "P5",
+      "name": "Tensora",
+      "persona": "a machine-learning framework: tensor operations, automatic differentiation, model training and serving, GPU/accelerator support."
+    }
+  ],
+  "_comment_hours": "Deterministic lookup, intent x product -> hours. Supplied to the model as-is (not estimated). QUESTION is always cheap (answer, no code change). FEATURE > BUG for every product (new capability costs more than a fix). P1/P4/P5 (systems / numerical libraries) cost slightly more than P2/P3 (application-level libraries) for the same intent -- a fixed, arbitrary-but-frozen asymmetry so the lookup is not trivially uniform.",
+  "hours_table": {
+    "P1": { "BUG": 3, "FEATURE": 5, "QUESTION": 1 },
+    "P2": { "BUG": 2, "FEATURE": 4, "QUESTION": 1 },
+    "P3": { "BUG": 2, "FEATURE": 4, "QUESTION": 1 },
+    "P4": { "BUG": 3, "FEATURE": 5, "QUESTION": 1 },
+    "P5": { "BUG": 3, "FEATURE": 5, "QUESTION": 1 }
+  },
+  "budget_hours": 20
+}

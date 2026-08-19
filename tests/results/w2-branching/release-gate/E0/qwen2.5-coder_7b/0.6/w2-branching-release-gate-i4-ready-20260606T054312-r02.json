@@ -1,0 +1,49 @@
+{
+  "run_id": "w2-branching-release-gate-i4-ready-20260606T054312-r02",
+  "timestamp": "2026-06-06T05:43:12.596774+00:00",
+  "config": {
+    "fixture_id": "w2-branching/release-gate",
+    "context": "E0",
+    "model_id": "qwen2.5-coder:7b",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "api",
+    "api_base_url": "http://ollama-host:11434",
+    "backend": "ollama",
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i4-ready",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 8175,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": [],
+    "request_messages": [
+      {
+        "role": "user",
+        "content": "SOL. no tools. file content={\"coverage\": 92, \"blocking_bugs\": 0, \"security_review\": \"passed\"}\n{\"$schema\": \"../../../../sol-schema.json\", \"name\": \"fixture-w2-release-gate\", \"version\": \"1.0\", \"description\": \"W2 branching-fidelity fixture. Reads a release record from a fixed file and classifies it into exactly one gate verdict. Each staged input is built so that exactly one branch is correct, so the returned verdict reveals which branch executed — that is the quality oracle. The per-branch trace TODOs emit a machine-readable BRANCH line so the checker can also verify fidelity.\", \"ref\": \"https://github.com/jtplugin/sol\", \"accepts\": {\"record_path\": {\"required\": true, \"desc\": \"path to a JSON release record staged by the runner; fields: coverage (number 0-100), blocking_bugs (integer >= 0), security_review (one of passed|pending|failed)\"}}, \"returns\": {\"verdict\": {\"anyof\": [\"BLOCKED\", \"INSUFFICIENT_COVERAGE\", \"SECURITY_HOLD\", \"READY\", \"INVALID_INPUT\"], \"required\": true, \"desc\": \"the single gate verdict; identifies the branch taken\"}}, \"ROUTINE\": [{\"RUN\": \"cat {{record_path}}\"}, {\"IF\": {\"when\": \"record_path was not provided, the file could not be read, or the record is missing any of coverage / blocking_bugs / security_review, or a field has the wrong type\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-guard\"}, {\"RETURN\": {\"verdict\": \"INVALID_INPUT\"}}]}}, {\"WHEN\": [{\"when\": \"blocking_bugs is greater than 0\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-0\"}, {\"RETURN\": {\"verdict\": \"BLOCKED\"}}]}, {\"when\": \"coverage is below 80\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-1\"}, {\"RETURN\": {\"verdict\": \"INSUFFICIENT_COVERAGE\"}}]}, {\"when\": \"security_review is not \\\"passed\\\"\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-2\"}, {\"RETURN\": {\"verdict\": \"SECURITY_HOLD\"}}]}, {\"else\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-else\"}, {\"RETURN\": {\"verdict\": \"READY\"}}]}]}]}\nTODO→verbatim. end: RETURN json. no markdown."
+      }
+    ]
+  },
+  "output": {
+    "raw": "```json\n{\n  \"verdict\": \"READY\"\n}\n```",
+    "returned_payload": {
+      "verdict": "READY"
+    }
+  },
+  "usage": {
+    "tokens_in": 615,
+    "tokens_out": 15,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}

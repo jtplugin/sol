@@ -1,0 +1,50 @@
+{
+  "run_id": "w1-linear-sales-summary-i4-complex-20260608T032804-r01",
+  "timestamp": "2026-06-08T03:28:04.208188+00:00",
+  "config": {
+    "fixture_id": "w1-linear/sales-summary",
+    "context": "E0",
+    "model_id": "claude-haiku-4-5",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "api",
+    "api_base_url": "https://api.anthropic.com",
+    "backend": "anthropic",
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i4-complex",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 2911,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": [],
+    "request_messages": [
+      {
+        "role": "user",
+        "content": "# Sales summary task\n\nCompute the sales summary by executing strictly the SOL script below.\n\n## Notes content\n\n```\n03/06 - G.Bassi scarpe tennis x2 paia @ 45 cad → tot 90€\n04/06 - L.Ferrari felpa L + felpa XL = 35+38 = 73€\n05/06 - P.Conti orologio sport 180€ reso parziale -30€ → netto 150€\n06/06 T.Manna - jeans 59€\n07/06 - C.Baldi costume + pareo = 25+15 = 40€\n08/06 F.Bruno - cappello sole 22€\n\n```\n\n## SOL script\n\n```json\n{\n  \"ROUTINE\": [\n    {\"TODO\": \"Read the sales annotations from the notes block above.\"},\n    {\"TODO\": \"Set running_total to 0 and sale_count to 0.\"},\n    {\n      \"REPEAT\": {\n        \"foreach\": \"line in the notes block\",\n        \"ROUTINE\": [\n          {\"TODO\": \"Skip blank lines and header/separator lines with no monetary amount.\"},\n          {\"TODO\": \"If the line is marked as cancelled, annulled, voided, reversed, or storno (in any language or abbreviation), skip it — do not add its amount.\"},\n          {\"TODO\": \"Extract the monetary amount from the line. Amounts may appear as: '89€', 'EUR 89', '89 euro', '(89)', 'tot 89', or as arithmetic expressions like '35+38=73' or '2x45=90' — in the latter cases use the final computed value.\"},\n          {\"TODO\": \"Add the extracted amount to running_total.\"},\n          {\"TODO\": \"Increment sale_count by 1.\"}\n        ]\n      }\n    },\n    {\"TODO\": \"Build the result as JSON: {\\\"total\\\": <running_total as a JSON number>, \\\"count\\\": <sale_count as a JSON integer>}. No other fields. Exact key casing.\"},\n    {\"RETURN\": \"{{result}}\"}\n  ]\n}\n```"
+      }
+    ]
+  },
+  "output": {
+    "raw": "I'll execute the SOL script step by step.\n\n**Step 1: Read the sales annotations**\n- Line 1: 03/06 - G.Bassi scarpe tennis x2 paia @ 45 cad → tot 90€\n- Line 2: 04/06 - L.Ferrari felpa L + felpa XL = 35+38 = 73€\n- Line 3: 05/06 - P.Conti orologio sport 180€ reso parziale -30€ → netto 150€\n- Line 4: 06/06 T.Manna - jeans 59€\n- Line 5: 07/06 - C.Baldi costume + pareo = 25+15 = 40€\n- Line 6: 08/06 F.Bruno - cappello sole 22€\n\n**Step 2: Initialize**\n- running_total = 0\n- sale_count = 0\n\n**Step 3: Process each line**\n\n| Line | Check | Amount | running_total | sale_count |\n|------|-------|--------|---|---|\n| 1 | Not cancelled, extract 90€ | 90 | 90 | 1 |\n| 2 | Not cancelled, extract 73€ (from 35+38=73) | 73 | 163 | 2 |\n| 3 | Not cancelled, extract 150€ (netto after -30€ adjustment) | 150 | 313 | 3 |\n| 4 | Not cancelled, extract 59€ | 59 | 372 | 4 |\n| 5 | Not cancelled, extract 40€ (from 25+15=40) | 40 | 412 | 5 |\n| 6 | Not cancelled, extract 22€ | 22 | 434 | 6 |\n\n**Step 4: Build result**\n\n```json\n{\n  \"total\": 434,\n  \"count\": 6\n}\n```",
+    "returned_payload": {
+      "total": 434,
+      "count": 6
+    }
+  },
+  "usage": {
+    "tokens_in": 543,
+    "tokens_out": 491,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}

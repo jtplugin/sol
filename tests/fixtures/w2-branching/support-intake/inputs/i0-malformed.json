@@ -1,0 +1,6 @@
+{
+  "queue": [
+    { "id": "x1", "title": "Crash on startup" },
+    { "id": "x2", "title": "Feature request: dark mode", "body": "Please add a dark theme." }
+  ]
+}

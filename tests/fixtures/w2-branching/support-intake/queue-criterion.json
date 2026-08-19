@@ -1,0 +1,12 @@
+{
+  "_status": "FROZEN — confirmed by Gianni 2026-08-03, before any queue generation (protocol SS4.4, SS8.1).",
+  "_rationale": "A randomly drawn queue may exhaust the budget at item 2, never exhaust it, or never produce an ESCALATE -- such queues measure nothing (the process degenerates: too little 'after' region, or no discriminating halt behaviour to test at all). The criterion concerns the INFORMATIVENESS of the queue composition, never its difficulty for any particular model -- that distinction is what separates this from cherry-picking (SS4.4). In this fixture's design, ESCALATE is the only event that sets halted_at (see reference.py), so 'budget exhausted' and 'an ESCALATE-eligible condition fired' collapse to a single observable: the queue must actually halt, and it must halt inside the window.",
+  "queue_size": 15,
+  "criterion": {
+    "must_halt": true,
+    "halt_position_min": 5,
+    "halt_position_max": 11,
+    "halt_position_semantics": "1-indexed position of the item that triggers ESCALATE (== reference.run_queue(...)['halted_at']'s item, located by its index in the ordered items list) within the drawn 15-item queue. Inclusive on both ends."
+  },
+  "malformed_input_case": "excluded from the K queues entirely -- it is a separate structural case (inputs/i0-malformed.json), not subject to this criterion (SS4.4)."
+}

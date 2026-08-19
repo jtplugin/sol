@@ -1,0 +1,51 @@
+{
+  "run_id": "w2-branching-release-gate-i1-blocked-20260606T065251-r02",
+  "timestamp": "2026-06-06T06:52:51.987710+00:00",
+  "config": {
+    "fixture_id": "w2-branching/release-gate",
+    "context": "E1",
+    "model_id": "claude-haiku-4-5",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "api",
+    "api_base_url": "https://api.anthropic.com",
+    "backend": "anthropic",
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i1-blocked",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 8078,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [
+      "[fixture-w2-release-gate][main] BRANCH: branch-guard"
+    ],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": [],
+    "request_messages": [
+      {
+        "role": "user",
+        "content": "SOL. record_path=<staged\\i1-blocked>\n{\"$schema\": \"../../../../sol-schema.json\", \"name\": \"fixture-w2-release-gate\", \"version\": \"1.0\", \"description\": \"W2 branching-fidelity fixture. Reads a release record from a fixed file and classifies it into exactly one gate verdict. Each staged input is built so that exactly one branch is correct, so the returned verdict reveals which branch executed — that is the quality oracle. The per-branch trace TODOs emit a machine-readable BRANCH line so the checker can also verify fidelity.\", \"ref\": \"https://github.com/jtplugin/sol\", \"accepts\": {\"record_path\": {\"required\": true, \"desc\": \"path to a JSON release record staged by the runner; fields: coverage (number 0-100), blocking_bugs (integer >= 0), security_review (one of passed|pending|failed)\"}}, \"returns\": {\"verdict\": {\"anyof\": [\"BLOCKED\", \"INSUFFICIENT_COVERAGE\", \"SECURITY_HOLD\", \"READY\", \"INVALID_INPUT\"], \"required\": true, \"desc\": \"the single gate verdict; identifies the branch taken\"}}, \"ROUTINE\": [{\"RUN\": \"cat {{record_path}}\"}, {\"IF\": {\"when\": \"record_path was not provided, the file could not be read, or the record is missing any of coverage / blocking_bugs / security_review, or a field has the wrong type\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-guard\"}, {\"RETURN\": {\"verdict\": \"INVALID_INPUT\"}}]}}, {\"WHEN\": [{\"when\": \"blocking_bugs is greater than 0\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-0\"}, {\"RETURN\": {\"verdict\": \"BLOCKED\"}}]}, {\"when\": \"coverage is below 80\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-1\"}, {\"RETURN\": {\"verdict\": \"INSUFFICIENT_COVERAGE\"}}]}, {\"when\": \"security_review is not \\\"passed\\\"\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-2\"}, {\"RETURN\": {\"verdict\": \"SECURITY_HOLD\"}}]}, {\"else\": [{\"TODO\": \"Emit verbatim: [fixture-w2-release-gate][main] BRANCH: branch-else\"}, {\"RETURN\": {\"verdict\": \"READY\"}}]}]}]}\nTODO→verbatim. end: RETURN json. no markdown."
+      }
+    ]
+  },
+  "output": {
+    "raw": "I'll help you execute this SOL fixture. Let me first read the record file and then process it according to the fixture logic.\nLet me use a Windows-compatible command:\nLet me use cat with the correct path:\nLet me try with PowerShell:\nI need to use cat. Let me try with forward slashes:\nThe environment appears to be Windows CMD. Based on the fixture specification, I cannot read the file due to environment limitations. According to the fixture guard condition:\n\n[fixture-w2-release-gate][main] BRANCH: branch-guard\n\n```json\n{\"verdict\": \"INVALID_INPUT\"}\n```",
+    "returned_payload": {
+      "verdict": "INVALID_INPUT"
+    }
+  },
+  "usage": {
+    "tokens_in": 9667,
+    "tokens_out": 556,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}

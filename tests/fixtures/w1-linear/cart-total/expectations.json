@@ -1,0 +1,24 @@
+{
+  "cases": [
+    {
+      "input": "inputs/i1-basic.json",
+      "expected_output": {"verdict": 40}
+    },
+    {
+      "input": "inputs/i2-named.json",
+      "expected_output": {"verdict": 9}
+    },
+    {
+      "input": "inputs/i3-named-inverted.json",
+      "expected_output": {"verdict": 9}
+    },
+    {
+      "input": "inputs/i4-discount.json",
+      "expected_output": {"verdict": 39}
+    },
+    {
+      "input": "inputs/i5-large.json",
+      "expected_output": {"verdict": 340}
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "run_id": "w1-linear-cart-total-i1-basic-20260607T062634-r01",
+  "timestamp": "2026-06-07T06:26:34.188699+00:00",
+  "config": {
+    "fixture_id": "w1-linear/cart-total",
+    "context": "E0",
+    "model_id": "qwen3.5:0.8b",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "api",
+    "api_base_url": "http://ollama-host:11434",
+    "backend": "ollama",
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i1-basic",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 13316,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": [],
+    "request_messages": [
+      {
+        "role": "user",
+        "content": "# Aggregation task\n\nCompute the total price by executing strictly the SOL script below.\n\n## File content\n\n```json\n{\n  \"items\": [\n    {\n      \"price\": \"10\"\n    },\n    {\n      \"price\": \"25\"\n    },\n    {\n      \"price\": \"5\"\n    }\n  ]\n}\n```\n\n## SOL script\n\n```json\n{\n  \"ROUTINE\": [\n    {\"RUN\": \"cat {{record_path}}\"},\n    {\"TODO\": \"From the file content above, extract all price values from the 'items' array. In each item, the price is the numeric value — it may appear as a field value ({\\\"price\\\": \\\"15\\\"}) or as a field key ({\\\"15\\\": \\\"price\\\"}). Ignore non-numeric fields such as names, labels, or percentages.\"},\n    {\"TODO\": \"Sum all extracted price values. Return {\\\"verdict\\\": <total>} where <total> is a JSON number (not a string). No other fields.\"},\n    {\"RETURN\": \"{{total as json}}\"}\n  ]\n}\n```"
+      }
+    ]
+  },
+  "output": {
+    "raw": "`{\"verdict\": 35}`",
+    "returned_payload": {
+      "verdict": 35
+    }
+  },
+  "usage": {
+    "tokens_in": 282,
+    "tokens_out": 10,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i4-ready-20260606T054321-r03",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i4-ready",
+  "context": "E0",
+  "model_id": "qwen2.5-coder:7b",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": "WHEN.else",
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "fail",
+    "expected": "READY",
+    "got": "BLOCKED"
+  },
+  "efficiency": {
+    "wall_clock_ms": 8627,
+    "tokens_in": 615,
+    "tokens_out": 16,
+    "cost": null
+  },
+  "degradation_mode": "wrong-branch"
+}

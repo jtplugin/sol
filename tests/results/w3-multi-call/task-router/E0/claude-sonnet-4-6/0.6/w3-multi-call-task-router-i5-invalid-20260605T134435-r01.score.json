@@ -1,0 +1,24 @@
+{
+  "run_id": "w3-multi-call-task-router-i5-invalid-20260605T134435-r01",
+  "fixture_id": "w3-multi-call/task-router",
+  "staged_input_id": "i5-invalid",
+  "context": "E0",
+  "model_id": "claude-sonnet-4-6",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": null,
+    "observed_branch": "branch-guard"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "INVALID_INPUT",
+    "got": "INVALID_INPUT"
+  },
+  "efficiency": {
+    "wall_clock_ms": 2887,
+    "tokens_in": 966,
+    "tokens_out": 36,
+    "cost": null
+  },
+  "degradation_mode": "none"
+}

@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i2-insufficient-coverage-20260604T124412-r02",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i2-insufficient-coverage",
+  "context": "E1",
+  "model_id": "claude-opus-4-8",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "WHEN[1] coverage < 80",
+    "observed_branch": "branch-1"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "INSUFFICIENT_COVERAGE",
+    "got": "INSUFFICIENT_COVERAGE"
+  },
+  "efficiency": {
+    "wall_clock_ms": 7995,
+    "tokens_in": 1098,
+    "tokens_out": 297,
+    "cost": 0.023370250000000002
+  },
+  "degradation_mode": "none"
+}

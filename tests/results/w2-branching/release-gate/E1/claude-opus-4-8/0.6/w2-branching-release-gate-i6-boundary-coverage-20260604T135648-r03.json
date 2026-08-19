@@ -1,0 +1,44 @@
+{
+  "run_id": "w2-branching-release-gate-i6-boundary-coverage-20260604T135648-r03",
+  "timestamp": "2026-06-04T13:56:48.224270+00:00",
+  "config": {
+    "fixture_id": "w2-branching/release-gate",
+    "context": "E1",
+    "model_id": "claude-opus-4-8",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "native",
+    "predictability_layers": [],
+    "runner_type": "claude-code",
+    "api_base_url": null,
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i6-boundary-coverage",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 6629,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [
+      "[fixture-w2-release-gate][main] BRANCH: branch-else"
+    ],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": []
+  },
+  "output": {
+    "raw": "[fixture-w2-release-gate][main] BRANCH: branch-else\n\n{\"verdict\": \"READY\"}",
+    "returned_payload": {
+      "verdict": "READY"
+    }
+  },
+  "usage": {
+    "tokens_in": 1095,
+    "tokens_out": 199,
+    "cost": 0.020901249999999996,
+    "sub_agent_count": null
+  }
+}

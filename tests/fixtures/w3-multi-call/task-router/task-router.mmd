@@ -1,0 +1,137 @@
+flowchart TD
+    %% W3 multi-call fixture. Reads a task request (effort_days, deadline_days) and routes it to the appro…
+
+    START1(["▶ fixture-w3-task-router"])
+    class START1 terminal
+    R2["RUN: cat {{record_path}}"]
+    class R2 run
+    C3{"record_path was not provided, the file could not be re…"}
+    class C3 ctrl
+    M4(" ")
+    class M4 merge
+    T5["Emit verbatim: [fixture-w3-task-router][main] BRANCH: …"]
+    class T5 todo
+    RETURN6(["↩️ RETURN: {'verdict': 'INVALID_INPUT'}"])
+    class RETURN6 return
+    T5 --> RETURN6
+    C3 -->|yes| T5
+    RETURN6 --> M4
+    C3 -->|no| M4
+    SD15[["define SUB: assess-capacity"]]
+    class SD15 sub
+    SD24[["define SUB: assess-urgency"]]
+    class SD24 sub
+    CALL25[["assess-capacity"]]
+    class CALL25 sub
+    CALL25 -.-> SE8
+    CALL26[["assess-urgency"]]
+    class CALL26 sub
+    CALL26 -.-> SE17
+    WM27(" ")
+    class WM27 merge
+    WC28{"capacity_class is HEAVY and urgency_class is URGENT"}
+    class WC28 ctrl
+    T29["Emit verbatim: [fixture-w3-task-router][main] BRANCH: …"]
+    class T29 todo
+    RETURN30(["↩️ RETURN: {'verdict': 'SPLIT'}"])
+    class RETURN30 return
+    T29 --> RETURN30
+    WC28 -->|yes| T29
+    RETURN30 --> WM27
+    WC31{"capacity_class is HEAVY and urgency_class is NORMAL"}
+    class WC31 ctrl
+    WC28 -->|no| WC31
+    T32["Emit verbatim: [fixture-w3-task-router][main] BRANCH: …"]
+    class T32 todo
+    RETURN33(["↩️ RETURN: {'verdict': 'SCHEDULE'}"])
+    class RETURN33 return
+    T32 --> RETURN33
+    WC31 -->|yes| T32
+    RETURN33 --> WM27
+    WC34{"capacity_class is LIGHT and urgency_class is URGENT"}
+    class WC34 ctrl
+    WC31 -->|no| WC34
+    T35["Emit verbatim: [fixture-w3-task-router][main] BRANCH: …"]
+    class T35 todo
+    RETURN36(["↩️ RETURN: {'verdict': 'EXPEDITE'}"])
+    class RETURN36 return
+    T35 --> RETURN36
+    WC34 -->|yes| T35
+    RETURN36 --> WM27
+    T37["Emit verbatim: [fixture-w3-task-router][main] BRANCH: …"]
+    class T37 todo
+    RETURN38(["↩️ RETURN: {'verdict': 'QUEUE'}"])
+    class RETURN38 return
+    T37 --> RETURN38
+    WC34 -->|no| T37
+    RETURN38 --> WM27
+    R2 --> C3
+    M4 --> SD15
+    SD15 --> SD24
+    SD24 --> CALL25
+    CALL25 --> CALL26
+    CALL26 --> WC28
+    START1 --> R2
+    END39(["⏹ end"])
+    class END39 terminal
+    WM27 --> END39
+
+    subgraph SG7 ["SUB: assess-capacity"]
+        SE8["assess-capacity"]
+        class SE8 sub
+    C9{"effort_days is greater than 5"}
+    class C9 ctrl
+    M10(" ")
+    class M10 merge
+    T11["Emit verbatim: [fixture-w3-task-router][assess-capacit…"]
+    class T11 todo
+    T12["Set capacity_class to HEAVY"]
+    class T12 todo
+    T11 --> T12
+    C9 -->|yes| T11
+    T12 --> M10
+    T13["Emit verbatim: [fixture-w3-task-router][assess-capacit…"]
+    class T13 todo
+    T14["Set capacity_class to LIGHT"]
+    class T14 todo
+    T13 --> T14
+    C9 -->|no| T13
+    T14 --> M10
+        SE8 --> C9
+    end
+    subgraph SG16 ["SUB: assess-urgency"]
+        SE17["assess-urgency"]
+        class SE17 sub
+    WM18(" ")
+    class WM18 merge
+    WC19{"deadline_days is less than or equal to 3"}
+    class WC19 ctrl
+    T20["Emit verbatim: [fixture-w3-task-router][assess-urgency…"]
+    class T20 todo
+    T21["Set urgency_class to URGENT"]
+    class T21 todo
+    T20 --> T21
+    WC19 -->|yes| T20
+    T21 --> WM18
+    T22["Emit verbatim: [fixture-w3-task-router][assess-urgency…"]
+    class T22 todo
+    T23["Set urgency_class to NORMAL"]
+    class T23 todo
+    T22 --> T23
+    WC19 -->|no| T22
+    T23 --> WM18
+        SE17 --> WC19
+    end
+
+    classDef todo     fill:#1d4ed8,stroke:#1e40af
+    classDef run      fill:#15803d,stroke:#166534
+    classDef ctrl     fill:#a16207,stroke:#854d0e
+    classDef agent    fill:#7e22ce,stroke:#6b21a8
+    classDef terminal fill:#1e293b,stroke:#475569
+    classDef onerror  fill:#b91c1c,stroke:#991b1b
+    classDef io       fill:#c2410c,stroke:#9a3412
+    classDef sub      fill:#047857,stroke:#065f46
+    classDef halt     fill:#450a0a,stroke:#dc2626
+    classDef return   fill:#334155,stroke:#1e293b
+    classDef import   fill:#475569,stroke:#334155
+    classDef merge    fill:#334155,stroke:#1e293b

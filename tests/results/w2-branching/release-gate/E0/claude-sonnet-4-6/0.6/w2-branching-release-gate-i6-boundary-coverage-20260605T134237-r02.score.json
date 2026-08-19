@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i6-boundary-coverage-20260605T134237-r02",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i6-boundary-coverage",
+  "context": "E0",
+  "model_id": "claude-sonnet-4-6",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "WHEN.else",
+    "observed_branch": "branch-else"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "READY",
+    "got": "READY"
+  },
+  "efficiency": {
+    "wall_clock_ms": 1573,
+    "tokens_in": 667,
+    "tokens_out": 29,
+    "cost": null
+  },
+  "degradation_mode": "none"
+}

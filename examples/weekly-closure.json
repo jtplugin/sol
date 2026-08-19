@@ -1,0 +1,54 @@
+{
+  "name": "weekly-closure",
+  "version": "1.0",
+  "description": "Weekly project closure — run every Friday before 17:00. Reads all project status files, computes velocity, writes a per-project summary report, updates the todo list, and sends the summary by email to the team.",
+  "ref": "https://github.com/jtplugin/sol",
+  "role": "Project manager performing the weekly team reporting cycle.",
+  "ROUTINE": [
+    { "TODO": "Read all status.md files in projects/", "model": "fast" },
+    {
+      "RUN": "python3 scripts/compute_velocity.py projects/",
+      "ONERROR": [
+        { "TODO": "Report that velocity computation failed and identify the cause" },
+        { "HALT": "Cannot write the summary without velocity data — fix scripts/compute_velocity.py and re-run." }
+      ]
+    },
+    { "TODO": "Read reports/velocity.json", "model": "fast" },
+    {
+      "REPEAT": {
+        "foreach": "project in the projects/ directory",
+        "ROUTINE": [
+          {
+            "TODO": "Write the section for {{project}} in reports/weekly-summary.md: overall status (green / yellow / red), the three most relevant points of the week, and priorities for next week",
+            "model": "smart"
+          },
+          {
+            "IF": {
+              "when": "{{project}} has velocity below 0.3 or has critical tasks blocked for more than 5 days",
+              "then": [
+                { "TODO": "Append an explicit alert note to {{project}}'s section in reports/weekly-summary.md" }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    { "TODO": "In todo.md, move all tasks that appear as closed in the status files to the Completati section", "model": "fast" },
+    { "TODO": "In todo.md, add the priorities identified in the summary to the top of the Questa settimana section", "model": "fast" },
+    { "TODO": "Prepare the email body from the content of reports/weekly-summary.md", "model": "fast" },
+    {
+      "IF": {
+        "when": "at least one project has red status",
+        "then": [
+          { "TODO": "Prepend a bold alert line to the email body listing the names of all red-status projects" }
+        ]
+      }
+    },
+    {
+      "TODO": "Send an email to team@company.com with subject 'Weekly Summary — {{today}}' and body equal to the prepared email body",
+      "ONERROR": [
+        { "TODO": "Save the prepared email body to reports/weekly-email-draft.md and report that the email could not be sent" }
+      ]
+    }
+  ]
+}

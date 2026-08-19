@@ -1,0 +1,45 @@
+{
+  "run_id": "w2-branching-release-gate-i4-ready-20260606T064340-r02",
+  "timestamp": "2026-06-06T06:43:40.911625+00:00",
+  "config": {
+    "fixture_id": "w2-branching/release-gate",
+    "context": "E1",
+    "model_id": "claude-haiku-4-5",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "native",
+    "predictability_layers": [],
+    "runner_type": "claude-code",
+    "api_base_url": null,
+    "backend": "anthropic",
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i4-ready",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 10175,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [
+      "[fixture-w2-release-gate][main] BRANCH: branch-else"
+    ],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": []
+  },
+  "output": {
+    "raw": "[fixture-w2-release-gate][main] BRANCH: branch-else\n\n```json\n{\n  \"verdict\": \"READY\"\n}\n```",
+    "returned_payload": {
+      "verdict": "READY"
+    }
+  },
+  "usage": {
+    "tokens_in": 15,
+    "tokens_out": 666,
+    "cost": 0.0201148,
+    "sub_agent_count": null
+  }
+}

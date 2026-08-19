@@ -1,0 +1,27 @@
+{
+  "run_id": "w3-multi-call-task-router-i2-heavy-normal-20260605T134416-r03",
+  "fixture_id": "w3-multi-call/task-router",
+  "staged_input_id": "i2-heavy-normal",
+  "context": "E0",
+  "model_id": "claude-sonnet-4-6",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": null,
+    "observed_branch": "branch-schedule"
+  },
+  "quality": {
+    "result": "fail",
+    "expected": "SCHEDULE",
+    "got": {
+      "effort_days": 8,
+      "deadline_days": 7
+    }
+  },
+  "efficiency": {
+    "wall_clock_ms": 4683,
+    "tokens_in": 966,
+    "tokens_out": 205,
+    "cost": null
+  },
+  "degradation_mode": "garbled-output"
+}

@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i3-security-hold-20260604T121215-r01",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i3-security-hold",
+  "context": "E1",
+  "model_id": "claude-opus-4-8",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": null,
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "fail",
+    "expected": "SECURITY_HOLD",
+    "got": null
+  },
+  "efficiency": {
+    "wall_clock_ms": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost": null
+  },
+  "degradation_mode": "execution-error"
+}

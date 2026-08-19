@@ -1,0 +1,26 @@
+{
+  "run_id": "w1-linear-cart-total-i5-large-20260607T094646-r07",
+  "fixture_id": "w1-linear/cart-total",
+  "staged_input_id": "i5-large",
+  "context": "E0",
+  "model_id": "qwen3.5:0.8b",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": null,
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "not_checkable",
+    "expected": {
+      "verdict": 340
+    },
+    "got": null
+  },
+  "efficiency": {
+    "wall_clock_ms": 212061,
+    "tokens_in": 3082,
+    "tokens_out": 937,
+    "cost": null
+  },
+  "degradation_mode": "no-output"
+}

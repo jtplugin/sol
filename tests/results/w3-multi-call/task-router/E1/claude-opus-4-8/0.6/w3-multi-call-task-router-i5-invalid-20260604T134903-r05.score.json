@@ -1,0 +1,24 @@
+{
+  "run_id": "w3-multi-call-task-router-i5-invalid-20260604T134903-r05",
+  "fixture_id": "w3-multi-call/task-router",
+  "staged_input_id": "i5-invalid",
+  "context": "E1",
+  "model_id": "claude-opus-4-8",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": null,
+    "observed_branch": "branch-guard"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "INVALID_INPUT",
+    "got": "INVALID_INPUT"
+  },
+  "efficiency": {
+    "wall_clock_ms": 6211,
+    "tokens_in": 1401,
+    "tokens_out": 201,
+    "cost": 0.024402749999999997
+  },
+  "degradation_mode": "none"
+}

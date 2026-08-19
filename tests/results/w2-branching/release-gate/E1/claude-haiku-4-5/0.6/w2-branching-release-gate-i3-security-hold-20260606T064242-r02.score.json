@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i3-security-hold-20260606T064242-r02",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i3-security-hold",
+  "context": "E1",
+  "model_id": "claude-haiku-4-5",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "WHEN[2] security_review != passed",
+    "observed_branch": "branch-2"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "SECURITY_HOLD",
+    "got": "SECURITY_HOLD"
+  },
+  "efficiency": {
+    "wall_clock_ms": 12027,
+    "tokens_in": 15,
+    "tokens_out": 612,
+    "cost": 0.019851050000000002
+  },
+  "degradation_mode": "none"
+}

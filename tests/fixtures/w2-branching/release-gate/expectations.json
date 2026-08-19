@@ -1,0 +1,64 @@
+{
+  "fixture": "fixture-w2-release-gate",
+  "workload_class": "W2",
+  "concern": "branch selection (control-flow fidelity)",
+  "min_environment": "E1",
+  "fidelity_oracle": "the value of returns.verdict identifies which branch executed (quality oracle); the BRANCH trace line identifies it independently (fidelity oracle). verdict == expected_verdict AND trace_branch_label == observed_branch together prove the right branch ran.",
+  "cases": [
+    {
+      "input": "inputs/i1-blocked.json",
+      "branch": "WHEN[0] blocking_bugs > 0",
+      "trace_branch_label": "branch-0",
+      "rationale": "blocking_bugs=2 makes only the first condition true",
+      "expected_output": {
+        "verdict": "BLOCKED"
+      }
+    },
+    {
+      "input": "inputs/i2-insufficient-coverage.json",
+      "branch": "WHEN[1] coverage < 80",
+      "trace_branch_label": "branch-1",
+      "rationale": "no blocking bugs; coverage=55 makes only the second condition true",
+      "expected_output": {
+        "verdict": "INSUFFICIENT_COVERAGE"
+      }
+    },
+    {
+      "input": "inputs/i3-security-hold.json",
+      "branch": "WHEN[2] security_review != passed",
+      "trace_branch_label": "branch-2",
+      "rationale": "no blocking bugs, coverage ok; security_review=pending makes only the third condition true",
+      "expected_output": {
+        "verdict": "SECURITY_HOLD"
+      }
+    },
+    {
+      "input": "inputs/i4-ready.json",
+      "branch": "WHEN.else",
+      "trace_branch_label": "branch-else",
+      "rationale": "no condition holds; the else branch is the only correct continuation",
+      "expected_output": {
+        "verdict": "READY"
+      }
+    },
+    {
+      "input": "inputs/i5-invalid.json",
+      "branch": "IF guard",
+      "trace_branch_label": "branch-guard",
+      "rationale": "coverage is a string (not a number) and blocking_bugs is null — the guard must fire before any WHEN branch",
+      "expected_output": {
+        "verdict": "INVALID_INPUT"
+      }
+    },
+    {
+      "input": "inputs/i6-boundary-coverage.json",
+      "branch": "WHEN.else",
+      "trace_branch_label": "branch-else",
+      "rationale": "coverage=80 is NOT less than 80 (strict inequality) — all conditions false, else branch is correct. Model handles strict inequalities correctly at exact boundary values: 5/5 READY.",
+      "expected_output": {
+        "verdict": "READY"
+      }
+    }
+  ],
+  "negative_design": "the five verdicts are mutually distinct strings, so any wrong branch is detectable in the output"
+}

@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local configuration — copy tests/env.example.json to tests/env.json and edit it
+tests/env.json
+.env
+
+# Claude Code — only .claude/skills/sol/ belongs to this repository; it is SOL
+# product (doc/README.md indexes it, and the fixture READMEs invoke sol-lint.py
+# from there). Anything else under .claude/ is local machine configuration.
+# Explicit whitelist so a new file cannot drift into the repository unnoticed.
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/sol/
+
+# minimum-context campaign — local dataset cache, never committed. The fixture is
+# published dehydrated; see doc/experiment-minimum-context.md and
+# tests/fixtures/w2-branching/support-intake/README.md for how to rehydrate it.
+tests/data-local/
+tests/fixtures/w2-branching/support-intake/inputs/queue-*.json
+
+# campaign driver — live coordination state, regenerable from
+# tests/campaign-cells.json + tests/results/index.jsonl
+tests/results/campaign-plan.json
+
+# Editor / OS
+.obsidian/
+.DS_Store

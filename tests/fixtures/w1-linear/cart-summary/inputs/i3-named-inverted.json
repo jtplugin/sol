@@ -1,0 +1,10 @@
+{
+  "items": [
+    {"name": "Apple", "price": "4"},
+    {"price": "2", "name": "Milk"},
+    {"name": "Bread", "price": "3"},
+    {"price": "7", "name": "Wine"},
+    {"name": "Tea", "price": "1"},
+    {"price": "5", "name": "Coffee"}
+  ]
+}

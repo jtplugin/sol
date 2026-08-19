@@ -1,0 +1,45 @@
+{
+  "run_id": "w2-branching-release-gate-i6-boundary-coverage-20260606T074326-r01",
+  "timestamp": "2026-06-06T07:43:26.902009+00:00",
+  "config": {
+    "fixture_id": "w2-branching/release-gate",
+    "context": "E0",
+    "model_id": "qwen2.5-coder:7b",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "api",
+    "api_base_url": "http://ollama-host:11434",
+    "backend": "ollama",
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i6-boundary-coverage",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 187122,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [
+      "[fixture-w2-release-gate][main] BRANCH: branch-else"
+    ],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": []
+  },
+  "output": {
+    "raw": "```json\n[fixture-w2-release-gate][main] BRANCH: branch-else\n{\"verdict\": \"READY\"}\n```",
+    "returned_payload": {
+      "verdict": "READY"
+    }
+  },
+  "usage": {
+    "tokens_in": 615,
+    "tokens_out": 29,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i3-security-hold-20260605T134219-r02",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i3-security-hold",
+  "context": "E0",
+  "model_id": "claude-sonnet-4-6",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "WHEN[2] security_review != passed",
+    "observed_branch": "branch-2"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "SECURITY_HOLD",
+    "got": "SECURITY_HOLD"
+  },
+  "efficiency": {
+    "wall_clock_ms": 1579,
+    "tokens_in": 667,
+    "tokens_out": 32,
+    "cost": null
+  },
+  "degradation_mode": "none"
+}

@@ -1,0 +1,76 @@
+flowchart TD
+    %% W2 branching-fidelity fixture. Reads a release record from a fixed file and classifies it into exac…
+
+    START1(["▶ fixture-w2-release-gate"])
+    class START1 terminal
+    R2["RUN: cat {{record_path}}"]
+    class R2 run
+    C3{"record_path was not provided, the file could not be re…"}
+    class C3 ctrl
+    M4(" ")
+    class M4 merge
+    T5["Emit verbatim: [fixture-w2-release-gate][main] BRANCH:…"]
+    class T5 todo
+    RETURN6(["↩️ RETURN: {'verdict': 'INVALID_INPUT'}"])
+    class RETURN6 return
+    T5 --> RETURN6
+    C3 -->|yes| T5
+    RETURN6 --> M4
+    C3 -->|no| M4
+    WM7(" ")
+    class WM7 merge
+    WC8{"blocking_bugs is greater than 0"}
+    class WC8 ctrl
+    T9["Emit verbatim: [fixture-w2-release-gate][main] BRANCH:…"]
+    class T9 todo
+    RETURN10(["↩️ RETURN: {'verdict': 'BLOCKED'}"])
+    class RETURN10 return
+    T9 --> RETURN10
+    WC8 -->|yes| T9
+    RETURN10 --> WM7
+    WC11{"coverage is below 80"}
+    class WC11 ctrl
+    WC8 -->|no| WC11
+    T12["Emit verbatim: [fixture-w2-release-gate][main] BRANCH:…"]
+    class T12 todo
+    RETURN13(["↩️ RETURN: {'verdict': 'INSUFFICIENT_COVERAGE'}"])
+    class RETURN13 return
+    T12 --> RETURN13
+    WC11 -->|yes| T12
+    RETURN13 --> WM7
+    WC14{"security_review is not 'passed'"}
+    class WC14 ctrl
+    WC11 -->|no| WC14
+    T15["Emit verbatim: [fixture-w2-release-gate][main] BRANCH:…"]
+    class T15 todo
+    RETURN16(["↩️ RETURN: {'verdict': 'SECURITY_HOLD'}"])
+    class RETURN16 return
+    T15 --> RETURN16
+    WC14 -->|yes| T15
+    RETURN16 --> WM7
+    T17["Emit verbatim: [fixture-w2-release-gate][main] BRANCH:…"]
+    class T17 todo
+    RETURN18(["↩️ RETURN: {'verdict': 'READY'}"])
+    class RETURN18 return
+    T17 --> RETURN18
+    WC14 -->|no| T17
+    RETURN18 --> WM7
+    R2 --> C3
+    M4 --> WC8
+    START1 --> R2
+    END19(["⏹ end"])
+    class END19 terminal
+    WM7 --> END19
+
+    classDef todo     fill:#1d4ed8,stroke:#1e40af
+    classDef run      fill:#15803d,stroke:#166534
+    classDef ctrl     fill:#a16207,stroke:#854d0e
+    classDef agent    fill:#7e22ce,stroke:#6b21a8
+    classDef terminal fill:#1e293b,stroke:#475569
+    classDef onerror  fill:#b91c1c,stroke:#991b1b
+    classDef io       fill:#c2410c,stroke:#9a3412
+    classDef sub      fill:#047857,stroke:#065f46
+    classDef halt     fill:#450a0a,stroke:#dc2626
+    classDef return   fill:#334155,stroke:#1e293b
+    classDef import   fill:#475569,stroke:#334155
+    classDef merge    fill:#334155,stroke:#1e293b

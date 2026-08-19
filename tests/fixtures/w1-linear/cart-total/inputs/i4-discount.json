@@ -1,0 +1,7 @@
+{
+  "items": [
+    {"product": "Widget", "price": "20", "discount_pct": "10"},
+    {"product": "Gadget", "price": "14", "discount_pct": "5"},
+    {"product": "Thing", "price": "5"}
+  ]
+}

@@ -1,0 +1,42 @@
+[
+  {
+    "cell": "qwen3.5-9b",
+    "gguf": "Qwen3.5-9B-Q4_K_M.gguf",
+    "ctx_size": 32768,
+    "kv_cache_type": "q8_0",
+    "n_parallel": 1,
+    "modes": ["llama-qwen3.5-9b-think", "llama-qwen3.5-9b-nothink"]
+  },
+  {
+    "cell": "ministral-3-8b",
+    "gguf": "Ministral-3-8B-Instruct-2512-Q4_K_M.gguf",
+    "ctx_size": 31744,
+    "kv_cache_type": "q8_0",
+    "n_parallel": 1,
+    "modes": ["llama-ministral-8b"]
+  },
+  {
+    "cell": "granite-4.1-8b",
+    "gguf": "granite-4.1-8b-Q4_K_M.gguf",
+    "ctx_size": 28672,
+    "kv_cache_type": "q8_0",
+    "n_parallel": 1,
+    "modes": ["llama-granite-4.1-8b"]
+  },
+  {
+    "cell": "gemma-4-12b",
+    "gguf": "gemma-4-12b-Q4_K_M.gguf",
+    "ctx_size": 31744,
+    "kv_cache_type": "q8_0",
+    "n_parallel": 1,
+    "modes": ["llama-gemma-4-12b"]
+  },
+  {
+    "cell": "phi4-mini",
+    "gguf": "Phi-4-mini-instruct-Q4_K_M.gguf",
+    "ctx_size": 32768,
+    "kv_cache_type": "q8_0",
+    "n_parallel": 1,
+    "modes": ["llama-phi4-mini"]
+  }
+]

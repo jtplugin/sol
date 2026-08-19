@@ -1,0 +1,30 @@
+{
+  "run_id": "w1-linear-cart-summary-i3-named-inverted-20260607T102118-r08",
+  "fixture_id": "w1-linear/cart-summary",
+  "staged_input_id": "i3-named-inverted",
+  "context": "E0",
+  "model_id": "qwen3.5:0.8b",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": null,
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "fail",
+    "expected": {
+      "total": 22,
+      "count": 6
+    },
+    "got": {
+      "total": 14,
+      "count": 5
+    }
+  },
+  "efficiency": {
+    "wall_clock_ms": 17340,
+    "tokens_in": 431,
+    "tokens_out": 20,
+    "cost": null
+  },
+  "degradation_mode": "wrong-value"
+}

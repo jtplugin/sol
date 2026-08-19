@@ -1,0 +1,24 @@
+{
+  "run_id": "w3-multi-call-task-router-i6-boundary-exact-20260604T135714-r05",
+  "fixture_id": "w3-multi-call/task-router",
+  "staged_input_id": "i6-boundary-exact",
+  "context": "E1",
+  "model_id": "claude-opus-4-8",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": null,
+    "observed_branch": "branch-expedite"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "EXPEDITE",
+    "got": "EXPEDITE"
+  },
+  "efficiency": {
+    "wall_clock_ms": 9081,
+    "tokens_in": 1400,
+    "tokens_out": 379,
+    "cost": 0.028777999999999998
+  },
+  "degradation_mode": "none"
+}

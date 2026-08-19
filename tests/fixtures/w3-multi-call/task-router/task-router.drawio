@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="START1" value="▶ fixture-w3-task-router" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#475569;fontColor=#f8fafc;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="290" y="80" width="220" height="60" />
+    </mxCell>
+    <mxCell id="R2" value="RUN: cat {{record_path}}" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontColor=#14532d;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="290" y="180" width="220" height="60" />
+    </mxCell>
+    <mxCell id="C3" value="record_path was not provided, the file could not be re…" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef9c3;strokeColor=#ca8a04;fontColor=#713f12;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="310" y="280" width="180" height="80" />
+    </mxCell>
+    <mxCell id="T4" value="Emit verbatim: [fixture-w3-task-router][main] BRANCH: …" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;fontColor=#1e3a8a;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="10" y="400" width="220" height="60" />
+    </mxCell>
+    <mxCell id="RETURN5" value="↩️ RETURN: {'verdict': 'INVALID_INPUT'}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#64748b;fontColor=#1e293b;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="10" y="500" width="220" height="60" />
+    </mxCell>
+    <mxCell id="e6" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="T4" target="RETURN5" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e7" value="yes" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="C3" target="T4" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="M8" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#94a3b8;opacity=50;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="390" y="600" width="20" height="20" />
+    </mxCell>
+    <mxCell id="e9" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="RETURN5" target="M8" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e10" value="no" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="C3" target="M8" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="SD11" value="define SUB: assess-capacity" style="shape=process;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#16a34a;fontColor=#14532d;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="290" y="660" width="220" height="60" />
+    </mxCell>
+    <mxCell id="SD12" value="define SUB: assess-urgency" style="shape=process;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#16a34a;fontColor=#14532d;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="290" y="760" width="220" height="60" />
+    </mxCell>
+    <mxCell id="CALL13" value="CALL: assess-capacity" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#16a34a;fontColor=#14532d;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="290" y="860" width="220" height="60" />
+    </mxCell>
+    <mxCell id="e14" value="" style="edgeStyle=none;html=1;rounded=0;dashed=1;" edge="1" source="CALL13" target="SD11" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="CALL15" value="CALL: assess-urgency" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f0fdf4;strokeColor=#16a34a;fontColor=#14532d;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="290" y="960" width="220" height="60" />
+    </mxCell>
+    <mxCell id="e16" value="" style="edgeStyle=none;html=1;rounded=0;dashed=1;" edge="1" source="CALL15" target="SD12" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="WC18" value="capacity_class is HEAVY and urgency_class is URGENT" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef9c3;strokeColor=#ca8a04;fontColor=#713f12;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="310" y="1060" width="180" height="80" />
+    </mxCell>
+    <mxCell id="T19" value="Emit verbatim: [fixture-w3-task-router][main] BRANCH: …" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;fontColor=#1e3a8a;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="10" y="1180" width="220" height="60" />
+    </mxCell>
+    <mxCell id="RETURN20" value="↩️ RETURN: {'verdict': 'SPLIT'}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#64748b;fontColor=#1e293b;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="10" y="1280" width="220" height="60" />
+    </mxCell>
+    <mxCell id="e21" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="T19" target="RETURN20" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e22" value="yes" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="WC18" target="T19" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e23" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="RETURN20" target="WM17" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="WC24" value="capacity_class is HEAVY and urgency_class is NORMAL" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef9c3;strokeColor=#ca8a04;fontColor=#713f12;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="310" y="1180" width="180" height="80" />
+    </mxCell>
+    <mxCell id="e25" value="no" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="WC18" target="WC24" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="T26" value="Emit verbatim: [fixture-w3-task-router][main] BRANCH: …" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;fontColor=#1e3a8a;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="10" y="1300" width="220" height="60" />
+    </mxCell>
+    <mxCell id="RETURN27" value="↩️ RETURN: {'verdict': 'SCHEDULE'}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#64748b;fontColor=#1e293b;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="10" y="1400" width="220" height="60" />
+    </mxCell>
+    <mxCell id="e28" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="T26" target="RETURN27" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e29" value="yes" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="WC24" target="T26" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e30" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="RETURN27" target="WM17" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="WC31" value="capacity_class is LIGHT and urgency_class is URGENT" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fef9c3;strokeColor=#ca8a04;fontColor=#713f12;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="310" y="1300" width="180" height="80" />
+    </mxCell>
+    <mxCell id="e32" value="no" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="WC24" target="WC31" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="T33" value="Emit verbatim: [fixture-w3-task-router][main] BRANCH: …" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;fontColor=#1e3a8a;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="10" y="1420" width="220" height="60" />
+    </mxCell>
+    <mxCell id="RETURN34" value="↩️ RETURN: {'verdict': 'EXPEDITE'}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#64748b;fontColor=#1e293b;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="10" y="1520" width="220" height="60" />
+    </mxCell>
+    <mxCell id="e35" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="T33" target="RETURN34" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e36" value="yes" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="WC31" target="T33" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e37" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="RETURN34" target="WM17" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="T38" value="Emit verbatim: [fixture-w3-task-router][main] BRANCH: …" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#3b82f6;fontColor=#1e3a8a;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="570" y="1420" width="220" height="60" />
+    </mxCell>
+    <mxCell id="RETURN39" value="↩️ RETURN: {'verdict': 'QUEUE'}" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#64748b;fontColor=#1e293b;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="570" y="1520" width="220" height="60" />
+    </mxCell>
+    <mxCell id="e40" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="T38" target="RETURN39" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e41" value="no" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="WC31" target="T38" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e42" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="RETURN39" target="WM17" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="WM17" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#94a3b8;opacity=50;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="390" y="1620" width="20" height="20" />
+    </mxCell>
+    <mxCell id="e43" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="R2" target="C3" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e44" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="M8" target="SD11" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e45" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="SD11" target="SD12" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e46" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="SD12" target="CALL13" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e47" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="CALL13" target="CALL15" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e48" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="CALL15" target="WC18" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e49" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="START1" target="R2" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="END50" value="⏹ end" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=#475569;fontColor=#f8fafc;" vertex="1" parent="1">
+      <mxGeometry as="geometry" x="290" y="1680" width="220" height="60" />
+    </mxCell>
+    <mxCell id="e51" value="" style="edgeStyle=none;html=1;rounded=0;" edge="1" source="WM17" target="END50" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>

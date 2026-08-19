@@ -1,0 +1,30 @@
+{
+  "run_id": "w1-linear-cart-summary-i5-large-20260608T032616-r01",
+  "fixture_id": "w1-linear/cart-summary",
+  "staged_input_id": "i5-large",
+  "context": "E0",
+  "model_id": "claude-haiku-4-5",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": null,
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "fail",
+    "expected": {
+      "total": 340,
+      "count": 100
+    },
+    "got": {
+      "total": 284,
+      "count": 100
+    }
+  },
+  "efficiency": {
+    "wall_clock_ms": 3025,
+    "tokens_in": 3095,
+    "tokens_out": 328,
+    "cost": null
+  },
+  "degradation_mode": "wrong-value"
+}

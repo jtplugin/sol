@@ -1,0 +1,42 @@
+{
+  "run_id": "w1-linear-sales-summary-i1-simple-20260608T034044-r01",
+  "timestamp": "2026-06-08T03:40:44.819894+00:00",
+  "config": {
+    "fixture_id": "w1-linear/sales-summary",
+    "context": "E0",
+    "model_id": "qwen3.5:9b",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "api",
+    "api_base_url": "http://ollama-host:11434",
+    "backend": "ollama",
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i1-simple",
+  "execution": {
+    "status": "error",
+    "wall_clock_ms": null,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": [],
+    "request_messages": []
+  },
+  "output": {
+    "raw": "timed out",
+    "returned_payload": null
+  },
+  "usage": {
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}

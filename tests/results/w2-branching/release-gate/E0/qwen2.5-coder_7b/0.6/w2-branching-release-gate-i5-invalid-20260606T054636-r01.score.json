@@ -1,0 +1,29 @@
+{
+  "run_id": "w2-branching-release-gate-i5-invalid-20260606T054636-r01",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i5-invalid",
+  "context": "E0",
+  "model_id": "qwen2.5-coder:7b",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": "IF guard",
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "fail",
+    "expected": "INVALID_INPUT",
+    "got": {
+      "TODO": "[fixture-w2-release-gate][main] BRANCH: branch-guard",
+      "RETURN": {
+        "verdict": "INVALID_INPUT"
+      }
+    }
+  },
+  "efficiency": {
+    "wall_clock_ms": 194793,
+    "tokens_in": 608,
+    "tokens_out": 43,
+    "cost": null
+  },
+  "degradation_mode": "garbled-output"
+}

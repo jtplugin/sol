@@ -1,0 +1,50 @@
+{
+  "run_id": "w3-multi-call-task-router-i5-invalid-20260605T134435-r01",
+  "timestamp": "2026-06-05T13:44:35.776074+00:00",
+  "config": {
+    "fixture_id": "w3-multi-call/task-router",
+    "context": "E0",
+    "model_id": "claude-sonnet-4-6",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "api",
+    "api_base_url": "https://api.anthropic.com",
+    "reasoning_budget": 0
+  },
+  "staged_input_id": "i5-invalid",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 2887,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [
+      "[fixture-w3-task-router][main] BRANCH: branch-guard"
+    ],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": [],
+    "request_messages": [
+      {
+        "role": "user",
+        "content": "SOL. no tools. file content={\"effort_days\": \"many\", \"deadline_days\": -1}\n{\"$schema\": \"../../../../sol-schema.json\", \"name\": \"fixture-w3-task-router\", \"version\": \"1.0\", \"description\": \"W3 multi-call fixture. Reads a task request (effort_days, deadline_days) and routes it to the appropriate scheduling action. Two SUBs — assess-capacity and assess-urgency — each produce an intermediate classification; the main WHEN composes them into a final routing verdict. Quality oracle: returned verdict matches expected routing action. Fidelity oracle: last BRANCH trace line from the main WHEN.\", \"accepts\": {\"record_path\": {\"required\": true, \"desc\": \"path to a JSON file with fields: effort_days (positive integer), deadline_days (positive integer)\"}}, \"returns\": {\"verdict\": {\"anyof\": [\"SPLIT\", \"SCHEDULE\", \"EXPEDITE\", \"QUEUE\", \"INVALID_INPUT\"], \"required\": true, \"desc\": \"routing action: SPLIT (heavy+urgent), SCHEDULE (heavy+normal), EXPEDITE (light+urgent), QUEUE (light+normal), INVALID_INPUT (bad record)\"}}, \"ROUTINE\": [{\"RUN\": \"cat {{record_path}}\"}, {\"IF\": {\"when\": \"record_path was not provided, the file could not be read, or effort_days or deadline_days is missing or not a positive integer\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w3-task-router][main] BRANCH: branch-guard\"}, {\"RETURN\": {\"verdict\": \"INVALID_INPUT\"}}]}}, {\"SUB\": {\"name\": \"assess-capacity\", \"ROUTINE\": [{\"IF\": {\"when\": \"effort_days is greater than 5\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w3-task-router][assess-capacity] BRANCH: capacity-heavy\"}, {\"TODO\": \"Set capacity_class to HEAVY\"}], \"else\": [{\"TODO\": \"Emit verbatim: [fixture-w3-task-router][assess-capacity] BRANCH: capacity-light\"}, {\"TODO\": \"Set capacity_class to LIGHT\"}]}}]}}, {\"SUB\": {\"name\": \"assess-urgency\", \"ROUTINE\": [{\"WHEN\": [{\"when\": \"deadline_days is less than or equal to 3\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w3-task-router][assess-urgency] BRANCH: urgency-urgent\"}, {\"TODO\": \"Set urgency_class to URGENT\"}]}, {\"else\": [{\"TODO\": \"Emit verbatim: [fixture-w3-task-router][assess-urgency] BRANCH: urgency-normal\"}, {\"TODO\": \"Set urgency_class to NORMAL\"}]}]}]}}, {\"CALL\": \"assess-capacity\"}, {\"CALL\": \"assess-urgency\"}, {\"WHEN\": [{\"when\": \"capacity_class is HEAVY and urgency_class is URGENT\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w3-task-router][main] BRANCH: branch-split\"}, {\"RETURN\": {\"verdict\": \"SPLIT\"}}]}, {\"when\": \"capacity_class is HEAVY and urgency_class is NORMAL\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w3-task-router][main] BRANCH: branch-schedule\"}, {\"RETURN\": {\"verdict\": \"SCHEDULE\"}}]}, {\"when\": \"capacity_class is LIGHT and urgency_class is URGENT\", \"then\": [{\"TODO\": \"Emit verbatim: [fixture-w3-task-router][main] BRANCH: branch-expedite\"}, {\"RETURN\": {\"verdict\": \"EXPEDITE\"}}]}, {\"else\": [{\"TODO\": \"Emit verbatim: [fixture-w3-task-router][main] BRANCH: branch-queue\"}, {\"RETURN\": {\"verdict\": \"QUEUE\"}}]}]}]}\nTODO→verbatim. end: RETURN json. no markdown."
+      }
+    ]
+  },
+  "output": {
+    "raw": "[fixture-w3-task-router][main] BRANCH: branch-guard\n\n```json\n{\"verdict\": \"INVALID_INPUT\"}\n```",
+    "returned_payload": {
+      "verdict": "INVALID_INPUT"
+    }
+  },
+  "usage": {
+    "tokens_in": 966,
+    "tokens_out": 36,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}

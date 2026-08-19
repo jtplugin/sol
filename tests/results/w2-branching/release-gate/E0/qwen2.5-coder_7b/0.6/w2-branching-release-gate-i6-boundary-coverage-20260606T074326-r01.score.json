@@ -1,0 +1,24 @@
+{
+  "run_id": "w2-branching-release-gate-i6-boundary-coverage-20260606T074326-r01",
+  "fixture_id": "w2-branching/release-gate",
+  "staged_input_id": "i6-boundary-coverage",
+  "context": "E0",
+  "model_id": "qwen2.5-coder:7b",
+  "fidelity": {
+    "result": "pass",
+    "expected_branch": "WHEN.else",
+    "observed_branch": "branch-else"
+  },
+  "quality": {
+    "result": "pass",
+    "expected": "READY",
+    "got": "READY"
+  },
+  "efficiency": {
+    "wall_clock_ms": 187122,
+    "tokens_in": 615,
+    "tokens_out": 29,
+    "cost": null
+  },
+  "degradation_mode": "none"
+}

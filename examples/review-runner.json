@@ -1,0 +1,33 @@
+{
+  "$schema": "../sol-schema.json",
+  "name": "review-runner",
+  "version": "1.0",
+  "description": "Run the review pass for a given environment: read the spec and test set, filter the tests for the target environment, evaluate the diff against them, and write the review. Invoked by an orchestrator that hands over the environment and the working context.",
+  "ref": "https://github.com/jtplugin/sol",
+  "role": "Senior reviewer evaluating a change against its specification and test set.",
+  "accepts": {
+    "env":         { "anyof": ["coding", "staging", "production"], "required": true, "desc": "target environment for this review pass" },
+    "task_dir":   { "required": true, "desc": "path of the task folder holding 00_spec.md, 00_test.json, 03_review.md" },
+    "repo_root":   { "required": true, "desc": "root of the project" },
+    "git_diff":    { "required": true, "desc": "output of git diff $(git merge-base HEAD main)...HEAD" },
+    "item_max":    { "number": true, "desc": "maximum number of test items to evaluate; if absent, evaluate all" },
+    "todolist_resume": { "json": true, "desc": "updated todolist; present only when resuming an interrupted run" }
+  },
+  "returns": {
+    "status": { "anyof": ["pass", "fail"], "required": true, "desc": "overall outcome of the review pass" },
+    "review": { "required": true, "desc": "content written to 03_review.md" }
+  },
+  "ROUTINE": [
+    { "TODO": "Read the spec at {task_dir}/00_spec.md and the test set at {task_dir}/00_test.json" },
+    { "TODO": "From the test set, keep only the entries where env == {env}. Call this subset test_entries_env. If item_max is provided, cap it at that many entries." },
+    { "TODO": "Evaluate git_diff against test_entries_env and the spec, recording a pass/fail and rationale for each entry", "model": "smart" },
+    {
+      "IF": {
+        "when": "every evaluated entry passes",
+        "then": [{ "TODO": "Set the review status to pass" }],
+        "else": [{ "TODO": "Set the review status to fail and list the failing entries with their rationale" }]
+      }
+    },
+    { "TODO": "Write the review to {task_dir}/03_review.md" }
+  ]
+}

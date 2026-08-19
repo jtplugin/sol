@@ -1,0 +1,27 @@
+{
+  "run_id": "w1-linear-sales-summary-i2-formats-20260608T005457-r03",
+  "fixture_id": "w1-linear/sales-summary",
+  "staged_input_id": "i2-formats",
+  "context": "E0",
+  "model_id": "qwen3.5:9b",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": null,
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "fail",
+    "expected": {
+      "total": 398,
+      "count": 5
+    },
+    "got": null
+  },
+  "efficiency": {
+    "wall_clock_ms": null,
+    "tokens_in": null,
+    "tokens_out": null,
+    "cost": null
+  },
+  "degradation_mode": "execution-error"
+}

@@ -1,0 +1,28 @@
+{
+  "run_id": "w1-linear-cart-total-i4-discount-20260607T065915-r01",
+  "fixture_id": "w1-linear/cart-total",
+  "staged_input_id": "i4-discount",
+  "context": "E0",
+  "model_id": "qwen2.5-coder:7b",
+  "fidelity": {
+    "result": "not_checkable",
+    "expected_branch": null,
+    "observed_branch": null
+  },
+  "quality": {
+    "result": "pass",
+    "expected": {
+      "verdict": 39
+    },
+    "got": {
+      "verdict": 39
+    }
+  },
+  "efficiency": {
+    "wall_clock_ms": 74940,
+    "tokens_in": 310,
+    "tokens_out": 16,
+    "cost": null
+  },
+  "degradation_mode": "none"
+}
