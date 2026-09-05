@@ -1,0 +1,412 @@
+{
+  "_comment": "build_requests.py — the 20 stratified requests of w2-branching/support-routing.",
+  "seed": 20260823,
+  "source_pool": "../support-intake/pool-manifest.json",
+  "synthetic_item": {
+    "id": "item-synth-01",
+    "title": "How do I change the number of vacation days accrued per month?",
+    "body": "Our HR administrator needs to raise the monthly accrual from 1.75 days to 2 days for staff past their fifth year. I can see the current figure on the employee record but the field is read-only for my role. Who can change it, and does the change apply to days already accrued this year or only from the next payroll period onwards?"
+  },
+  "requests": [
+    {
+      "request_id": "r01",
+      "stratum": "owner-open",
+      "item_id": "item-041",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P1",
+        "intent": "BUG"
+      },
+      "expected_action": "ASSIGN",
+      "expected_team": "T1"
+    },
+    {
+      "request_id": "r02",
+      "stratum": "owner-open",
+      "item_id": "item-173",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P3",
+        "intent": "QUESTION"
+      },
+      "expected_action": "ASSIGN",
+      "expected_team": "T2"
+    },
+    {
+      "request_id": "r03",
+      "stratum": "owner-open",
+      "item_id": "item-274",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P5",
+        "intent": "FEATURE"
+      },
+      "expected_action": "ASSIGN",
+      "expected_team": "T3"
+    },
+    {
+      "request_id": "r04",
+      "stratum": "owner-closed-backup",
+      "item_id": "item-084",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "CLOSED",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P2",
+        "intent": "FEATURE"
+      },
+      "expected_action": "ASSIGN",
+      "expected_team": "T2"
+    },
+    {
+      "request_id": "r05",
+      "stratum": "owner-closed-backup",
+      "item_id": "item-137",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "CLOSED",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P3",
+        "intent": "BUG"
+      },
+      "expected_action": "ASSIGN",
+      "expected_team": "T1"
+    },
+    {
+      "request_id": "r06",
+      "stratum": "trap-limited-bug",
+      "item_id": "item-106",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "LIMITED",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P2",
+        "intent": "BUG"
+      },
+      "expected_action": "ASSIGN",
+      "expected_team": "T1"
+    },
+    {
+      "request_id": "r07",
+      "stratum": "trap-limited-bug",
+      "item_id": "item-285",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "LIMITED"
+        }
+      },
+      "ground_truth": {
+        "product": "P5",
+        "intent": "BUG"
+      },
+      "expected_action": "ASSIGN",
+      "expected_team": "T3"
+    },
+    {
+      "request_id": "r08",
+      "stratum": "trap-limited-bug",
+      "item_id": "item-138",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "LIMITED",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P3",
+        "intent": "BUG"
+      },
+      "expected_action": "ASSIGN",
+      "expected_team": "T2"
+    },
+    {
+      "request_id": "r09",
+      "stratum": "limited-nonbug-backup",
+      "item_id": "item-095",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "LIMITED",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P2",
+        "intent": "FEATURE"
+      },
+      "expected_action": "ASSIGN",
+      "expected_team": "T2"
+    },
+    {
+      "request_id": "r10",
+      "stratum": "limited-nonbug-backup",
+      "item_id": "item-177",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "LIMITED",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P3",
+        "intent": "QUESTION"
+      },
+      "expected_action": "ASSIGN",
+      "expected_team": "T1"
+    },
+    {
+      "request_id": "r11",
+      "stratum": "no-team-available",
+      "item_id": "item-067",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "CLOSED",
+          "T2": "CLOSED",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P2",
+        "intent": "BUG"
+      },
+      "expected_action": "DEFER",
+      "expected_team": null
+    },
+    {
+      "request_id": "r12",
+      "stratum": "no-team-available",
+      "item_id": "item-040",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "CLOSED",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P1",
+        "intent": "FEATURE"
+      },
+      "expected_action": "DEFER",
+      "expected_team": null
+    },
+    {
+      "request_id": "r13",
+      "stratum": "no-team-available",
+      "item_id": "item-263",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "LIMITED",
+          "T3": "LIMITED"
+        }
+      },
+      "ground_truth": {
+        "product": "P5",
+        "intent": "FEATURE"
+      },
+      "expected_action": "DEFER",
+      "expected_team": null
+    },
+    {
+      "request_id": "r14",
+      "stratum": "accepted-by-nobody",
+      "item_id": "item-231",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P4",
+        "intent": "BUG"
+      },
+      "expected_action": "UNASSIGNED",
+      "expected_team": null
+    },
+    {
+      "request_id": "r15",
+      "stratum": "accepted-by-nobody",
+      "item_id": "item-219",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P4",
+        "intent": "FEATURE"
+      },
+      "expected_action": "UNASSIGNED",
+      "expected_team": null
+    },
+    {
+      "request_id": "r16",
+      "stratum": "bug-over-budget",
+      "item_id": "item-043",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 2,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P1",
+        "intent": "BUG"
+      },
+      "expected_action": "ESCALATE",
+      "expected_team": null
+    },
+    {
+      "request_id": "r17",
+      "stratum": "bug-over-budget",
+      "item_id": "item-253",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 1,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P5",
+        "intent": "BUG"
+      },
+      "expected_action": "ESCALATE",
+      "expected_team": null
+    },
+    {
+      "request_id": "r18",
+      "stratum": "nonbug-over-budget",
+      "item_id": "item-085",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 3,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P2",
+        "intent": "FEATURE"
+      },
+      "expected_action": "DEFER",
+      "expected_team": null
+    },
+    {
+      "request_id": "r19",
+      "stratum": "nonbug-over-budget",
+      "item_id": "item-166",
+      "synthetic": false,
+      "world": {
+        "remaining_hours": 0,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "P3",
+        "intent": "QUESTION"
+      },
+      "expected_action": "DEFER",
+      "expected_team": null
+    },
+    {
+      "request_id": "r20",
+      "stratum": "off-catalog",
+      "item_id": "item-synth-01",
+      "synthetic": true,
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "ground_truth": {
+        "product": "UNKNOWN",
+        "intent": "QUESTION"
+      },
+      "expected_action": "NEEDS_INFO",
+      "expected_team": null
+    }
+  ]
+}

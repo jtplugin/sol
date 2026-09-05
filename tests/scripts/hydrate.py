@@ -22,7 +22,11 @@ Two independent jobs:
   --mode queues  queues-manifest.json (committed: ordered item ids per queue)
                  + data-local/pool-main.json -> fixture inputs/queue-01.json
                  .. queue-10.json (id/title/body ONLY -- no product/intent,
-                 the model must classify), gitignored.
+                 the model must classify).
+
+  --mode requests support-routing's items-manifest.json + data-local/pool-main.json
+                 -> that fixture's inputs/r01.json .. r20.json, one item each
+                 plus the world state it is decided against.
 
 Usage:
     python3 tests/scripts/hydrate.py --mode pool
@@ -42,6 +46,7 @@ if hasattr(sys.stdout, "reconfigure"):
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_DIR = REPO_ROOT / "tests" / "fixtures" / "w2-branching" / "support-intake"
+ROUTING_DIR = REPO_ROOT / "tests" / "fixtures" / "w2-branching" / "support-routing"
 DATA_LOCAL = REPO_ROOT / "tests" / "data-local"
 DEFAULT_CSV = DATA_LOCAL / "nlbse2024" / "issues_test.csv"
 
@@ -115,18 +120,73 @@ def hydrate_queues() -> None:
     print(f"Hydrated {len(manifest['queues'])} queues into {inputs_dir.relative_to(REPO_ROOT)}/")
 
 
+def hydrate_requests(routing_dir: Path | None = None) -> None:
+    """support-routing's twenty staged requests, one item each.
+
+    Same shape as hydrate_queues, one item instead of fifteen, plus the world
+    state that item is decided against -- the hours left and the state of the
+    three teams. That state is computed by build_requests.py from the oracle and
+    written into items-manifest.json; it is never carried over from a previous
+    request's answer, which is what keeps the twenty runs independent (SS4.5).
+
+    The off-catalog request is written rather than drawn -- no item from five
+    real repositories can be UNKNOWN -- so its text lives in the manifest and
+    needs no pool lookup.
+    """
+    routing_dir = routing_dir or ROUTING_DIR
+    manifest = json.loads((routing_dir / "items-manifest.json").read_text(encoding="utf-8"))
+    # The MAIN arms draw from pool-main.json; the REPLICATION arms (manifest
+    # `split` == "REPLICATION") from pool-replication.json -- the sealed half,
+    # openable only at SS8.3 step 5. Never merged: an id resolving in the wrong
+    # pool would be a split leak, and the loud KeyError is the guard.
+    pool_name = ("pool-replication.json" if manifest.get("split") == "REPLICATION"
+                 else "pool-main.json")
+    pool_path = DATA_LOCAL / pool_name
+    if not pool_path.exists():
+        sys.exit(f"{pool_path} not found -- run 'hydrate.py --mode pool' first.")
+    pool_main = {row["id"]: row for row in json.loads(pool_path.read_text(encoding="utf-8"))}
+    synthetic = manifest["synthetic_item"]
+
+    inputs_dir = routing_dir / "inputs"
+    inputs_dir.mkdir(parents=True, exist_ok=True)
+
+    for req in manifest["requests"]:
+        if req["synthetic"]:
+            row = synthetic
+        else:
+            row = pool_main.get(req["item_id"])
+            if row is None:
+                sys.exit(f"{req['item_id']} ({req['request_id']}) not found in {pool_name}")
+        payload = {
+            "item": {"id": row["id"], "title": row["title"], "body": row["body"]},
+            "remaining_hours": req["world"]["remaining_hours"],
+            "teams": req["world"]["teams"],
+        }
+        out_path = inputs_dir / f"{req['request_id']}.json"
+        out_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False),
+                            encoding="utf-8")
+
+    print(f"Hydrated {len(manifest['requests'])} requests into "
+          f"{inputs_dir.relative_to(REPO_ROOT)}/")
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--mode", required=True, choices=["pool", "queues"])
+    p.add_argument("--mode", required=True, choices=["pool", "queues", "requests"])
     p.add_argument("--csv", type=Path, default=DEFAULT_CSV)
+    p.add_argument("--routing-dir", type=Path, default=None,
+                   help="requests mode only: fixture dir to hydrate "
+                        "[default: support-routing]. Use for the -repl arms.")
     args = p.parse_args()
 
     if args.mode == "pool":
         if not args.csv.exists():
             sys.exit(f"CSV not found: {args.csv}")
         hydrate_pool(args.csv)
-    else:
+    elif args.mode == "queues":
         hydrate_queues()
+    else:
+        hydrate_requests(args.routing_dir)
 
 
 if __name__ == "__main__":

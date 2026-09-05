@@ -1,24 +1,40 @@
 {
+  "fixture": "fixture-w1-cart-summary",
   "cases": [
     {
       "input": "inputs/i1-basic.json",
-      "expected_output": {"total": 48, "count": 4}
+      "expected_output": {
+        "total": 48,
+        "count": 4
+      }
     },
     {
       "input": "inputs/i2-named.json",
-      "expected_output": {"total": 20, "count": 5}
+      "expected_output": {
+        "total": 20,
+        "count": 5
+      }
     },
     {
       "input": "inputs/i3-named-inverted.json",
-      "expected_output": {"total": 22, "count": 6}
+      "expected_output": {
+        "total": 22,
+        "count": 6
+      }
     },
     {
       "input": "inputs/i4-discount.json",
-      "expected_output": {"total": 50, "count": 4}
+      "expected_output": {
+        "total": 50,
+        "count": 4
+      }
     },
     {
       "input": "inputs/i5-large.json",
-      "expected_output": {"total": 340, "count": 100}
+      "expected_output": {
+        "total": 340,
+        "count": 100
+      }
     }
   ]
 }

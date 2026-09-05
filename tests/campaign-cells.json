@@ -1,42 +1,68 @@
 [
   {
-    "cell": "qwen3.5-9b",
+    "cell": "qwen3.5-9b-nothink",
+    "runner_type": "api",
     "gguf": "Qwen3.5-9B-Q4_K_M.gguf",
-    "ctx_size": 32768,
+    "ctx_size": 51200,
     "kv_cache_type": "q8_0",
     "n_parallel": 1,
-    "modes": ["llama-qwen3.5-9b-think", "llama-qwen3.5-9b-nothink"]
+    "modes": [
+      "llama-qwen3.5-9b-nothink"
+    ]
   },
   {
     "cell": "ministral-3-8b",
+    "runner_type": "api",
     "gguf": "Ministral-3-8B-Instruct-2512-Q4_K_M.gguf",
-    "ctx_size": 31744,
+    "ctx_size": 38912,
     "kv_cache_type": "q8_0",
     "n_parallel": 1,
-    "modes": ["llama-ministral-8b"]
+    "modes": [
+      "llama-ministral-8b"
+    ]
   },
   {
     "cell": "granite-4.1-8b",
+    "runner_type": "api",
     "gguf": "granite-4.1-8b-Q4_K_M.gguf",
     "ctx_size": 28672,
     "kv_cache_type": "q8_0",
     "n_parallel": 1,
-    "modes": ["llama-granite-4.1-8b"]
+    "modes": [
+      "llama-granite-4.1-8b"
+    ]
   },
   {
     "cell": "gemma-4-12b",
-    "gguf": "gemma-4-12b-Q4_K_M.gguf",
-    "ctx_size": 31744,
+    "runner_type": "api",
+    "gguf": "gemma-4-12b-it-qat-UD-Q4_K_L.gguf",
+    "ctx_size": 43008,
     "kv_cache_type": "q8_0",
     "n_parallel": 1,
-    "modes": ["llama-gemma-4-12b"]
+    "modes": [
+      "llama-gemma-4-12b"
+    ]
   },
   {
     "cell": "phi4-mini",
+    "runner_type": "api",
     "gguf": "Phi-4-mini-instruct-Q4_K_M.gguf",
-    "ctx_size": 32768,
+    "ctx_size": 43008,
     "kv_cache_type": "q8_0",
     "n_parallel": 1,
-    "modes": ["llama-phi4-mini"]
+    "modes": [
+      "llama-phi4-mini"
+    ]
+  },
+  {
+    "cell": "qwen3.5-9b-think",
+    "runner_type": "api",
+    "gguf": "Qwen3.5-9B-Q4_K_M.gguf",
+    "ctx_size": 51200,
+    "kv_cache_type": "q8_0",
+    "n_parallel": 1,
+    "modes": [
+      "llama-qwen3.5-9b-think"
+    ]
   }
 ]

@@ -50,6 +50,7 @@ from runner.runner import (
     _load_fixture, _load_input, _stage,
     _record_path, _score_path, _append_index,
     _parse_trace, _extract_payload,
+    L1_INSTRUCTION,
 )
 
 DEFAULT_TIMEOUT_S = 120
@@ -71,7 +72,12 @@ def _list_inputs(fixture_dir: Path) -> list[str]:
 # ---------------------------------------------------------------------------
 
 def _build_prompt_e0(sol_doc: dict, bundle: InputBundle, fixture_body: str) -> str:
-    """E0: no tools — file content injected into the markdown fixture template."""
+    """E0: no tools — file content injected into the markdown fixture template.
+
+    This runner has no --level flag, so it builds the documented default of the
+    collateral-context scale: L1, i.e. the fixture body (input data + the SOL
+    script) plus the minimal instruction. See api_executor._build_prompt_e0.
+    """
     body = fixture_body
     if bundle.mode == "single":
         fc = json.dumps(bundle.payload, indent=2, ensure_ascii=False)
@@ -79,7 +85,7 @@ def _build_prompt_e0(sol_doc: dict, bundle: InputBundle, fixture_body: str) -> s
     else:
         for stem, text in bundle.files.items():
             body = body.replace("{{" + stem + "}}", text)
-    return body
+    return body + "\n\n" + L1_INSTRUCTION
 
 
 def _build_prompt_e1(sol_doc: dict, staged_path: Path) -> str:
@@ -96,11 +102,20 @@ def _build_prompt_e1(sol_doc: dict, staged_path: Path) -> str:
 # ---------------------------------------------------------------------------
 
 def _build_cmd(
-    prompt: str, model: str, context: str, sandbox: Path,
+    model: str, context: str, sandbox: Path,
     reasoning_budget: int = 0,
 ) -> list[str]:
+    """The command, without the prompt: it goes on stdin (see _invoke).
+
+    Windows caps a command line at 32,767 characters and raises
+    ERROR_FILENAME_EXCED_RANGE past it, which Python surfaces as
+    FileNotFoundError -- indistinguishable from a missing executable. This runner
+    only ever built L1 prompts and stayed under the cap by luck; campaign.py's
+    L3/L4 prompts (38k and 45k characters on the routing fixture) do not, and hit
+    it on 2026-08-31. Passing the prompt on stdin removes the ceiling for both.
+    """
     cmd = [
-        "claude", "-p", prompt,
+        "claude", "-p",
         "--output-format", "json",
         "--model", model,
         "--add-dir", str(sandbox),
@@ -112,7 +127,17 @@ def _build_cmd(
         # E1: Bash restricted to `cat` — enough to execute RUN steps.
         cmd += ["--tools", "Bash", "--allowed-tools", "Bash(cat *)"]
     if reasoning_budget > 0:
-        cmd += ["--thinking", str(reasoning_budget)]
+        # There is no --thinking flag on the claude CLI (checked against
+        # `claude --help`, 2026-08-31), so this branch used to build a command
+        # the CLI rejects with "unknown option" -- a non-zero exit that the
+        # caller files as an execution error of the model. A mode that asks this
+        # runner for a thinking budget is misconfigured, and says so here rather
+        # than turning into a column of red runs.
+        sys.exit(
+            f"reasoning_budget={reasoning_budget} was asked of the claude-code runner, "
+            f"which has no way to set one: the CLI exposes no thinking-budget flag. "
+            f"Set 'reasoning': 0 on the mode, or run it through the api runner."
+        )
     return cmd
 
 
@@ -138,11 +163,12 @@ def _invoke(
     else:
         prompt = _build_prompt_e1(sol_doc, staged_path)
 
-    cmd = _build_cmd(prompt, model, context, sandbox, reasoning_budget=reasoning_budget)
+    cmd = _build_cmd(model, context, sandbox, reasoning_budget=reasoning_budget)
 
     try:
         result = subprocess.run(
             cmd,
+            input=prompt,
             capture_output=True,
             text=True,
             timeout=timeout_s,

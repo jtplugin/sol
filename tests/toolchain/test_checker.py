@@ -299,7 +299,7 @@ def test_fidelity_not_checkable_without_trace():
 # Sequence oracle (W2 state-accumulation fixtures, e.g. support-intake).
 # Self-contained synthetic fixture -- does NOT depend on the generated
 # support-intake pool/queues, so this suite stays deterministic even before
-# the pool is manually verified.
+# the pool is manually verified (item 2.6 of the build plan).
 # ---------------------------------------------------------------------------
 
 SEQ_CATALOG = {
@@ -390,6 +390,34 @@ def test_comprehension_partial_misclassification():
     assert score.fidelity.sequence_rate == 1.0
 
 
+def test_no_eval_line_at_all_is_not_checkable_not_zero():
+    """A run that never said what it thought has not been measured. Scoring it 0.0
+    puts it where a model that named every product and missed every one sits, and
+    those are opposite findings.
+
+    215 of MAIN's 493 runs landed here (2026-08-23). granite-4.1-8b answers with a
+    markdown table instead of the trace lines: read off the payload it does return,
+    it classifies at 0.59, and it was reading 0.00 on every row."""
+    steps = ["[fixture-w2-support-intake][main] BRANCH: item=i1 action=ASSIGN remaining=1"]
+    score = check(_seq_record(steps, PERFECT_PAYLOAD), SEQ_EXPECTATIONS)
+    assert score.comprehension is not None
+    assert score.comprehension.rate is None
+    assert score.comprehension.result == "not_checkable"
+
+
+def test_a_partial_trace_is_still_scored_over_every_item():
+    """The other half of the rule. One EVAL line out of two is a model that engaged
+    with the instruction and stopped, and the item it never spoke about is its own
+    doing -- unlike silence, which is the bench learning nothing."""
+    steps = [
+        "[fixture-w2-support-intake][main] EVAL: item=i1 product=P1 intent=FEATURE",
+        "[fixture-w2-support-intake][main] BRANCH: item=i1 action=ASSIGN remaining=1",
+    ]
+    score = check(_seq_record(steps, PERFECT_PAYLOAD), SEQ_EXPECTATIONS)
+    assert score.comprehension.rate == 0.5    # 1 right of 2 items, not 1 of 1
+    assert score.comprehension.result == "fail"
+
+
 def test_conditional_fidelity_isolates_control_flow_from_comprehension():
     # Model misclassifies i2 as P1/QUESTION (1h, which WOULD fit remaining=1)
     # but its own BRANCH trace still says ESCALATE (inconsistent with what it
@@ -423,6 +451,161 @@ def test_degradation_no_halt_overran():
     score = check(_seq_record(steps, {"status": "OK", "items": [], "remaining_hours": -3, "halted_at": None}),
                   SEQ_EXPECTATIONS)
     assert score.degradation_mode == "no-halt"
+
+
+# ---------------------------------------------------------------------------
+# no-halt needs a queue, 2026-08-29
+#
+# `support-routing` delivers one item per invocation (SS4.5), so its expected
+# sequence has length 1. There is no queue to run past and no arrest to miss,
+# but the label fired anyway: any action other than ESCALATE at position 0 read
+# as a failure to halt. It carried 57 labels on routing, 55 of them a model
+# answering ASSIGN where the oracle said ESCALATE. Worse, it overwrote what the
+# payload comparison had already found -- 13 of the 57 had returned no payload
+# at all and were `no-output` until the sequence oracle relabelled them.
+# ---------------------------------------------------------------------------
+
+# The per-item shape, in the suite's synthetic terms: one item, expected
+# ESCALATE, nothing after it.
+PER_ITEM_EXPECTATIONS = {
+    "catalog": SEQ_CATALOG,
+    "cases": [{
+        "input": "inputs/r1.json",
+        "expected_sequence": ["item=i1 action=ESCALATE"],
+        "expected_output": {"status": "OK",
+                            "items": [{"id": "i1", "action": "ESCALATE"}],
+                            "remaining_hours": 1, "halted_at": "i1"},
+        "comprehension_ground_truth": [
+            {"id": "i1", "product": "P2", "intent": "BUG", "tolerant": False, "tolerant_alt_label": None},
+        ],
+    }],
+}
+
+
+def test_a_wrong_action_on_a_single_item_is_not_a_missed_halt():
+    """The 55. One item, expected ESCALATE, model says ASSIGN: a wrong answer,
+    not a queue that ran away. It belongs to the payload comparison."""
+    steps = [
+        "[fixture-w2-support-routing][main] EVAL: item=i1 product=P2 intent=BUG",
+        "[fixture-w2-support-routing][main] BRANCH: item=i1 action=ASSIGN remaining=1",
+    ]
+    payload = {"status": "OK", "items": [{"id": "i1", "action": "ASSIGN"}],
+               "remaining_hours": 1, "halted_at": None}
+    score = check(_seq_record(steps, payload, input_id="r1"), PER_ITEM_EXPECTATIONS)
+    assert score.degradation_mode == "wrong-value"
+
+
+def test_a_single_item_run_that_returned_nothing_keeps_its_own_label():
+    """The 13. No payload is a delivery failure, and the sequence oracle used to
+    overwrite it with a fidelity label -- hiding the more basic thing that went
+    wrong."""
+    steps = [
+        "[fixture-w2-support-routing][main] EVAL: item=i1 product=P2 intent=BUG",
+        "[fixture-w2-support-routing][main] BRANCH: item=i1 action=ASSIGN remaining=1",
+    ]
+    score = check(_seq_record(steps, None, input_id="r1"), PER_ITEM_EXPECTATIONS)
+    assert score.degradation_mode == "no-output"
+
+
+def test_extra_branch_lines_on_a_single_item_are_not_a_missed_halt():
+    """The 2. A second BRANCH line for an item that had one is redundant trace,
+    which `redundancy_ratio` already measures. Still not a queue."""
+    steps = [
+        "[fixture-w2-support-routing][main] EVAL: item=i1 product=P2 intent=BUG",
+        "[fixture-w2-support-routing][main] BRANCH: item=i1 action=ESCALATE remaining=1",
+        "[fixture-w2-support-routing][main] EVAL: item=i1 product=P2 intent=BUG",
+        "[fixture-w2-support-routing][main] BRANCH: item=i1 action=ASSIGN remaining=-2",
+    ]
+    payload = PER_ITEM_EXPECTATIONS["cases"][0]["expected_output"]
+    score = check(_seq_record(steps, payload, input_id="r1"), PER_ITEM_EXPECTATIONS)
+    assert score.degradation_mode != "no-halt"
+
+
+def test_the_queue_case_is_untouched_by_the_restriction():
+    """Intake's 458 labels sit on queues of six to eleven items. The guard is on
+    the length of the expected sequence, and must not reach them."""
+    score = check(_seq_record(PERFECT_STEPS[:2] + [
+        "[fixture-w2-support-intake][main] EVAL: item=i2 product=P2 intent=BUG",
+        "[fixture-w2-support-intake][main] BRANCH: item=i2 action=ASSIGN remaining=-2",
+    ], {"status": "OK", "items": [], "remaining_hours": -2, "halted_at": None}), SEQ_EXPECTATIONS)
+    assert score.degradation_mode == "no-halt"
+
+
+# ---------------------------------------------------------------------------
+# halt-not-taken, 2026-08-24
+#
+# Found by asking why qwen3.5-9b-nothink never once passed on MAIN. It was not
+# improbable, it was impossible: 0 of 213 runs returned a payload with the right
+# number of items, and 154 of 181 readable payloads carried all fifteen. Yet 46
+# of those named the CORRECT halted_at while doing it -- the model knows where
+# the queue stops, says so, and hands back the whole queue anyway.
+#
+# The finding this label carries is that the failure is not ignorance of the
+# rule. The process is a REPEAT with a RETURN nested three levels inside it, and
+# the model read that RETURN as a fact to report rather than an exit to take.
+# The payload contradicts itself, and that contradiction is the observation.
+# ---------------------------------------------------------------------------
+
+def _overran_payload(halted_at):
+    """Three items where two were expected -- the queue was never truncated."""
+    return {"status": "OK",
+            "items": [{"id": "i1", "action": "ASSIGN"},
+                      {"id": "i2", "action": "ESCALATE"},
+                      {"id": "i3", "action": "DEFER"}],
+            "remaining_hours": 1, "halted_at": halted_at}
+
+
+def test_degradation_halt_not_taken_when_the_payload_names_the_right_halt():
+    score = check(_seq_record(PERFECT_STEPS, _overran_payload("i2")), SEQ_EXPECTATIONS)
+    assert score.degradation_mode == "halt-not-taken"
+
+
+def test_halt_not_taken_needs_no_trace_at_all():
+    """Why the label is read off the payload and not off the trace.
+
+    granite-4.1-8b emits no trace on most of its campaign, so the trace-based
+    no-halt can barely see it: 5 labels in 189 runs. Read off the payload, the
+    same model shows 14 halt-not-taken. A model that answers in JSON and skips
+    the scaffolding is still telling us what it did with the loop."""
+    score = check(_seq_record([], _overran_payload("i2")), SEQ_EXPECTATIONS)
+    assert score.degradation_mode == "halt-not-taken"
+
+
+def test_a_wrong_halted_at_is_plain_no_halt_not_halt_not_taken():
+    """The boundary. What makes this label worth having is the CONTRADICTION --
+    right stopping point, wrong delivery. A model that overran without ever
+    locating the halt has made an ordinary mistake and keeps the ordinary
+    label."""
+    overran_steps = PERFECT_STEPS + [
+        "[fixture-w2-support-intake][main] EVAL: item=i3 product=P1 intent=QUESTION",
+        "[fixture-w2-support-intake][main] BRANCH: item=i3 action=DEFER remaining=1",
+    ]
+    for named in ("i3", None):
+        score = check(_seq_record(overran_steps, _overran_payload(named)), SEQ_EXPECTATIONS)
+        assert score.degradation_mode == "no-halt"
+        # And with no trace to overrun, it falls through to the ordinary
+        # payload comparison rather than borrowing either halt label.
+        score = check(_seq_record([], _overran_payload(named)), SEQ_EXPECTATIONS)
+        assert score.degradation_mode != "halt-not-taken"
+
+
+def test_stopping_at_the_right_length_is_never_halt_not_taken():
+    """Overrunning is half the definition: a payload of the expected length has
+    taken the halt, whatever else may be wrong with it."""
+    score = check(_seq_record(PERFECT_STEPS, PERFECT_PAYLOAD), SEQ_EXPECTATIONS)
+    assert score.degradation_mode != "halt-not-taken"
+
+
+def test_halt_not_taken_takes_precedence_over_no_halt():
+    """It is a strictly more informative sub-case, so it must be checked first;
+    otherwise the 82 runs that carry the contradiction disappear into the 722
+    that merely overran."""
+    payload = _overran_payload("i2")
+    score = check(_seq_record(PERFECT_STEPS + [
+        "[fixture-w2-support-intake][main] EVAL: item=i3 product=P1 intent=QUESTION",
+        "[fixture-w2-support-intake][main] BRANCH: item=i3 action=DEFER remaining=1",
+    ], payload), SEQ_EXPECTATIONS)
+    assert score.degradation_mode == "halt-not-taken"
 
 
 def test_degradation_partial_sequence():
@@ -529,3 +712,129 @@ def test_checker_against_real_support_intake_expectations():
     assert score.fidelity.conditional_rate == 1.0
     assert score.comprehension.rate == 1.0
     assert score.degradation_mode == "none"
+
+
+# ---------------------------------------------------------------------------
+# sequence oracle, label shapes (2026-08-22)
+# ---------------------------------------------------------------------------
+
+def test_sequence_oracle_reads_bare_branch_labels():
+    """A fixture whose BRANCH labels are bare words must be able to pass.
+
+    Until 2026-08-22 the sequence oracle read only the keyed shape
+    ('item=<id> action=<a> remaining=<n>'), so a run that emitted exactly the
+    expected labels observed an EMPTY sequence and scored 0.0 -- 'fail' on a
+    perfect run. polarity-flip's expected_sequence is ['parse', 'flip']: it
+    could not pass by construction, and no result of it would have been about
+    the model."""
+    from runner.checker import _check_sequence_fidelity
+
+    class Trace:
+        steps = ["[fixture-w0-polarity-flip][main] BRANCH: parse",
+                 "[fixture-w0-polarity-flip][main] BRANCH: flip"]
+
+    fidelity = _check_sequence_fidelity(Trace(), {"expected_sequence": ["parse", "flip"]})
+    assert fidelity.observed_sequence == ["parse", "flip"]
+    assert fidelity.sequence_rate == 1.0
+    assert fidelity.result == "pass"
+
+
+def test_sequence_oracle_still_drops_the_budget_from_keyed_labels():
+    """The keyed shape carries `remaining=`, expected_sequence never does: the
+    running budget is data, not a control-flow decision. Generalising the
+    extractor must not start comparing it."""
+    from runner.checker import _check_sequence_fidelity
+
+    class Trace:
+        steps = ["[fixture-w2-support-intake][main] BRANCH: item=i1 action=ASSIGN remaining=17",
+                 "[fixture-w2-support-intake][main] BRANCH: item=i2 action=DEFER remaining=17"]
+
+    fidelity = _check_sequence_fidelity(
+        Trace(), {"expected_sequence": ["item=i1 action=ASSIGN", "item=i2 action=DEFER"]})
+    assert fidelity.observed_sequence == ["item=i1 action=ASSIGN", "item=i2 action=DEFER"]
+    assert fidelity.result == "pass"
+
+
+# ---------------------------------------------------------------------------
+# Quality rate — field-level agreement (SS12 2026-08-25)
+# ---------------------------------------------------------------------------
+
+from runner.checker import _field_rate  # noqa: E402
+
+ROUTING_EXPECTED = {
+    "status": "OK",
+    "item": {"id": "item-041", "product": "P1", "intent": "BUG",
+             "hours": 3, "team": "T1", "action": "ASSIGN"},
+    "remaining_hours": 17,
+}
+
+
+def test_field_rate_perfect_payload_is_one():
+    assert _field_rate(ROUTING_EXPECTED, ROUTING_EXPECTED) == 1.0
+
+
+def test_field_rate_one_wrong_leaf_of_eight():
+    got = {**ROUTING_EXPECTED,
+           "item": {**ROUTING_EXPECTED["item"], "team": "T2"}}
+    assert _field_rate(got, ROUTING_EXPECTED) == 7 / 8
+
+
+def test_field_rate_strict_like_the_binary_verdict():
+    # "17" against 17 is a miss here exactly as wrong-format is a fail there.
+    got = {**ROUTING_EXPECTED, "remaining_hours": "17"}
+    assert _field_rate(got, ROUTING_EXPECTED) == 7 / 8
+
+
+def test_field_rate_missing_nested_object_costs_all_its_leaves():
+    got = {"status": "OK", "remaining_hours": 17}
+    assert _field_rate(got, ROUTING_EXPECTED) == 2 / 8
+
+
+def test_field_rate_expected_null_matches_missing_key():
+    # INVALID_INPUT case: item null, remaining null. A payload without the
+    # keys compares as None — the binary check's behaviour, kept on purpose.
+    expected = {"status": "INVALID_INPUT", "item": None, "remaining_hours": None}
+    assert _field_rate({"status": "INVALID_INPUT"}, expected) == 1.0
+
+
+def test_field_rate_lists_by_position():
+    expected = {"items": [{"id": "a"}, {"id": "b"}]}
+    assert _field_rate({"items": [{"id": "a"}, {"id": "x"}]}, expected) == 0.5
+    assert _field_rate({"items": [{"id": "a"}]}, expected) == 0.5  # short list
+
+
+def test_field_rate_non_dict_payload_is_zero():
+    assert _field_rate(["not", "a", "dict"], ROUTING_EXPECTED) == 0.0
+
+
+def test_quality_rate_lands_in_score_record():
+    score = check(make_record(payload={"verdict": "BLOCKED"}), EXPECTATIONS)
+    assert score.quality.rate == 1.0
+    score = check(make_record(payload={"verdict": "READY"}), EXPECTATIONS)
+    assert score.quality.rate == 0.0
+
+
+def test_quality_rate_absent_when_no_payload():
+    score = check(make_record(payload=None, raw=""), EXPECTATIONS)
+    assert score.quality.rate is None
+
+
+def test_quality_rate_reaches_the_index_from_the_writer(tmp_path, monkeypatch):
+    """It used to reach index.jsonl only through backfill_index_scores.py, never
+    from _append_index, so every run wrote a row without it and the column stayed
+    blank until somebody remembered to backfill. Noticed 2026-08-31 on 280 fresh
+    rows. The graded measure is what tells a wrong answer from a right answer with
+    one field off; a run that has to be remembered is a run that will not be."""
+    import json
+    import runner.runner as runner_mod
+
+    monkeypatch.setattr(runner_mod, "RESULTS_DIR", tmp_path)
+    monkeypatch.setattr(runner_mod, "INDEX_PATH", tmp_path / "index.jsonl")
+
+    record = make_record(payload={"verdict": "BLOCKED"})
+    score = check(record, EXPECTATIONS)
+    runner_mod._append_index(record, score)
+
+    row = json.loads((tmp_path / "index.jsonl").read_text(encoding="utf-8").splitlines()[0])
+    assert "quality_rate" in row, "the graded quality never reaches the analysis surface"
+    assert row["quality_rate"] == score.quality.rate == 1.0

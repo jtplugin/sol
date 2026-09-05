@@ -81,10 +81,10 @@ def main() -> None:
         except Exception as exc:
             print(f"  [warn] unload request failed: {exc}")
 
-    # Read ollama URL from env.json for the first ollama mode found.
+    # Read ollama URL from modes.json for the first ollama mode found.
     import json as _json
-    _env = _json.loads((REPO_ROOT / "tests" / "env.json").read_text(encoding="utf-8"))
-    _mode_map = {e["mode"]: e for e in _env.get("modes", [])}
+    _modes = _json.loads((REPO_ROOT / "tests" / "modes.json").read_text(encoding="utf-8"))
+    _mode_map = {e["mode"]: e for e in _modes.get("modes", [])}
 
     def _ollama_url(mode: str) -> str:
         return _mode_map.get(mode, {}).get("url", "http://localhost:11434")

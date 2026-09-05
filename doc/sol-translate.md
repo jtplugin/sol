@@ -10,7 +10,7 @@
 
 You give it a document. It gives you back one or more SOL JSON files — with the right constructs, the right model tiers, and the right file structure for the complexity of what you described.
 
-It also ships two standalone Python scripts that render any SOL file as a diagram: `sol2mermaid.py` for Mermaid flowcharts and `sol2drawio.py` for draw.io XML.
+It also ships three standalone Python scripts that render any SOL file as a derived view: `sol2mermaid.py` for Mermaid flowcharts, `sol2drawio.py` for draw.io XML, and `sol2prose.py` for a narrative rendering in plain language — the return trip, used to check that the generated SOL says what you meant.
 
 ---
 
@@ -112,16 +112,20 @@ The skill decides how many files to generate:
 - **Single file** — process has fewer than ~15 top-level instructions and no reusable cross-process components
 - **Multi-file** — two or more named `AGENT` definitions (each goes to `agents/<name>.json`), or `SUB` blocks reusable across processes (go to `shared/<name>.json`); a main entry point imports them via `IMPORT`
 
-### 6. Diagram (optional)
+### 6. Derived view (optional)
 
-After the SOL files are written, the skill asks whether you want a diagram and which format:
+After the SOL files are written, the skill asks whether you want a derived view and in which
+format:
 
 ```
 python3 sol2mermaid.py <process.json>   # Mermaid flowchart (.mmd)
 python3 sol2drawio.py  <process.json>   # draw.io XML (.drawio)
+python3 sol2prose.py   <process.json>   # narrative prose (.prose.md)
 ```
 
-Both scripts use the same semantic color scheme, so diagrams look consistent across formats.
+The two diagram scripts use the same semantic color scheme, so diagrams look consistent across
+formats. The prose script closes the loop the translation opened: you described the process in
+plain language, and you get it back in plain language to check against what you meant.
 
 ---
 
@@ -218,6 +222,64 @@ Node colors match the Mermaid convention exactly — the same semantic color sch
 
 ---
 
+## sol2prose.py
+
+A self-contained Python script that renders any SOL file — or the `json` code fences inside a
+markdown host document — as narrative prose in execution order. No dependencies beyond the
+standard library.
+
+### Usage
+
+```bash
+# writes process.prose.md next to the input file
+python3 sol2prose.py process.json
+
+# writes to a specific path
+python3 sol2prose.py process.json docs/process.md
+
+# prints to stdout
+python3 sol2prose.py process.json --stdout
+
+# renders every SOL fence inside a markdown host document
+python3 sol2prose.py process.md
+
+# scaffolding in Italian (default: en)
+python3 sol2prose.py process.json --lang it
+```
+
+The default output is `<stem>.prose.md`, never `<stem>.md`: a bare `.md` would overwrite the
+markdown document that hosts the SOL fences.
+
+### What it renders
+
+| Construct | Rendered as |
+|---|---|
+| Root | Title, description, version / `model` / `role` / `env`, and the `accepts` / `returns` contracts field by field |
+| `TODO` | The instruction text, verbatim |
+| `RUN` | "Run exactly: `<command>`", verbatim |
+| `IF` | "If …, then:" with an indented body, plus "Otherwise:" |
+| `WHEN` | "Depending on the case:" with one "When …:" block per branch; a `WHEN` with no `else` says so explicitly |
+| `REPEAT` | "For each …:" / "While …, repeat:" / "Repeat until …:" / "Repeat N times:" |
+| `SUB` / `AGENT` definitions | A marker in the flow; the body in a *Subroutines* / *Agents* appendix |
+| `CALL` | "Call the subroutine «…», which sees everything this process sees." |
+| `SPAWN` / `DELEGATE` | The hand-off to a clean context, with what is passed and what is expected back |
+| `IMPORT` | "Load the definitions from …" |
+| `RETURN` | "End this process and hand control back to whoever invoked it…" |
+| `HALT` | "Stop the entire run…" |
+| `WAITUSERINPUT` | "Pause and ask the human: …" |
+| `ONERROR` | "If that fails:" nested under the step it guards; the global handler gets its own section |
+| `model` / `role` | Trailing markers on the step — intent a flowchart cannot show |
+| `{{placeholder}}` | Flagged as a value coming from context, not from the document |
+
+### Two rules
+
+- **It never translates.** `--lang` templates only the connective scaffolding. Leaves are quoted
+  verbatim in the language the author wrote them, so the comparison against the source is exact.
+- **It renders, it does not judge.** Correctness findings stay with `sol-lint.py`.
+
+
+---
+
 ## Example
 
 Given this natural language description:
@@ -233,11 +295,17 @@ Running `sol2mermaid.py` on it produces a Mermaid flowchart with a chain of cond
 ## File layout
 
 ```
-.claude/skills/sol-translate/
-├── SKILL.md              ← skill definition (the SOL process + reference tables)
+.claude/skills/sol/
+├── SKILL.md              ← skill definition (the refinement passes and the reference tables)
+├── spec/
+│   └── reference.md      ← full SOL 0.6 specification
+├── guides/               ← binding authoring guides (authoring, contracts, borderline cases,
+│                            translation, sol-vs-prose)
 ├── scripts/
+│   ├── sol-lint.py       ← deterministic linter (Python, no external dependencies)
 │   ├── sol2mermaid.py    ← Mermaid generator (Python, no external dependencies)
-│   └── sol2drawio.py     ← draw.io XML generator (Python, no external dependencies)
+│   ├── sol2drawio.py     ← draw.io XML generator (Python, no external dependencies)
+│   └── sol2prose.py      ← narrative prose renderer (Python, no external dependencies)
 └── LICENSE               ← MIT
 ```
 
@@ -246,4 +314,4 @@ Running `sol2mermaid.py` on it produces a Mermaid flowchart with a chain of cond
 ## License
 
 MIT License — Copyright (c) 2026 Gianni Tommasi.
-See [LICENSE](../LICENSE).
+See [LICENSE](../.claude/skills/sol/LICENSE).

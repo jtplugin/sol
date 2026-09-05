@@ -10,7 +10,7 @@ accepts:
     desc: "path to a JSON file with field 'items': array of objects each containing exactly one price value"
 returns:
   verdict:
-    type: number
+    number: true
     required: true
     desc: "sum of all price values in the items array, as a JSON number"
 ---

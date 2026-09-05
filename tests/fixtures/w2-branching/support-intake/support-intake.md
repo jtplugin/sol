@@ -29,8 +29,6 @@ returns:
 
 # Support intake triage task
 
-Triage the support queue by executing strictly the SOL script below.
-
 ## File content
 
 ```json
@@ -38,9 +36,6 @@ Triage the support queue by executing strictly the SOL script below.
 ```
 
 ## Product catalog
-
-Five products. Use ONLY the persona descriptions below to classify each item -- do not
-guess at real-world product names.
 
 ```json
 {
@@ -133,7 +128,7 @@ guess at real-world product names.
                         {"TODO": "Set halted_at to item.id."},
                         {"TODO": "Append {\"id\": item.id, \"product\": product, \"intent\": intent, \"hours\": hours, \"action\": \"ESCALATE\"} to items. Do not change remaining_hours."},
                         {"TODO": "Emit verbatim, filling placeholders: [fixture-w2-support-intake][main] BRANCH: item={{item.id}} action=ESCALATE remaining={{remaining_hours}}"},
-                        {"TODO": "Build the result as JSON: {\"status\": \"OK\", \"items\": {{items}}, \"remaining_hours\": {{remaining_hours}}, \"halted_at\": {{halted_at}}}. JSON ONLY, no other output, exact key casing."},
+                        {"TODO": "Build the result as JSON: {\"status\": \"OK\", \"items\": {{items}}, \"remaining_hours\": {{remaining_hours}}, \"halted_at\": {{halted_at}}}. JSON ONLY, no other fields, exact key casing. The EVAL and BRANCH lines are not part of it."},
                         {"RETURN": "{{result}}"}
                       ]
                     },
@@ -159,7 +154,7 @@ guess at real-world product names.
         ]
       }
     },
-    {"TODO": "Build the result as JSON: {\"status\": \"OK\", \"items\": {{items}}, \"remaining_hours\": {{remaining_hours}}, \"halted_at\": {{halted_at}}}. JSON ONLY, no other output, exact key casing."},
+    {"TODO": "Build the result as JSON: {\"status\": \"OK\", \"items\": {{items}}, \"remaining_hours\": {{remaining_hours}}, \"halted_at\": {{halted_at}}}. JSON ONLY, no other fields, exact key casing. The EVAL and BRANCH lines are not part of it."},
     {"RETURN": "{{result}}"}
   ]
 }

@@ -11,7 +11,7 @@
     "repo_root":   { "required": true, "desc": "root of the project" },
     "git_diff":    { "required": true, "desc": "output of git diff $(git merge-base HEAD main)...HEAD" },
     "item_max":    { "number": true, "desc": "maximum number of test items to evaluate; if absent, evaluate all" },
-    "todolist_resume": { "json": true, "desc": "updated todolist; present only when resuming an interrupted run" }
+    "todolist_resume": { "json": true, "desc": "updated project todolist; present only when resuming an interrupted run" }
   },
   "returns": {
     "status": { "anyof": ["pass", "fail"], "required": true, "desc": "overall outcome of the review pass" },

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-sol2mermaid.py — Convert a SOL 0.5.0 process file to a Mermaid flowchart diagram.
+sol2mermaid.py — Convert a SOL 0.6 process file to a Mermaid flowchart diagram.
 
 MIT License
 Copyright (c) 2026 Gianni Tommasi
@@ -14,6 +14,60 @@ Usage:
 import json
 import sys
 from pathlib import Path
+
+
+CONSTRAINT_KEYS = ("required", "anyof", "number", "json", "desc")
+
+
+def fmt_value(value) -> str:
+    """A SOL field value as readable text.
+
+    Structured `accepts`/`returns` contracts (SOL 0.6.0), `IMPORT` lists and structured
+    `RETURN` values arrive as dicts/lists. Passing them through `str()` prints a Python
+    repr — `True` instead of `true`, single quotes — so this renders them the way
+    `sol2prose.py` does, keeping the three derived views consistent.
+    """
+    if value is None:
+        return ""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, list):
+        return ", ".join(fmt_value(v) for v in value)
+    if isinstance(value, dict):
+        return "; ".join(f"{k}{fmt_constraints(v)}" for k, v in value.items())
+    return str(value)
+
+
+def fmt_constraints(spec) -> str:
+    """The constraint suffix of one contract field, or the raw value if it is not one."""
+    if not isinstance(spec, dict):
+        return f": {fmt_value(spec)}"
+    if not spec:
+        return ""
+    if not any(k in spec for k in CONSTRAINT_KEYS):
+        return ": " + json.dumps(spec, ensure_ascii=False)
+    parts = []
+    if spec.get("required"):
+        parts.append("required")
+    if "anyof" in spec:
+        parts.append("one of: " + fmt_value(spec["anyof"]))
+    if spec.get("number"):
+        parts.append("numeric")
+    if spec.get("json"):
+        parts.append("json")
+    out = ""
+    if spec.get("desc"):
+        out += f" — {spec['desc']}"
+    if parts:
+        out += f" ({'; '.join(parts)})"
+    return out
+
+
+def fmt_contract_lines(value) -> list:
+    """A contract as one text line per field, so a wide contract is not truncated whole."""
+    if isinstance(value, dict) and value:
+        return [f"{k}{fmt_constraints(v)}" for k, v in value.items()]
+    return [fmt_value(value)]
 
 
 class Sol2Mermaid:
@@ -36,6 +90,10 @@ class Sol2Mermaid:
     def _esc(self, text, max_len: int = 55) -> str:
         s = str(text).replace('"', "'").replace("\n", " ").replace("`", "'").strip()
         return s if len(s) <= max_len else s[: max_len - 1] + "…"
+
+    def _contract_label(self, field: str, value) -> str:
+        lines = [self._esc(line, 90) for line in fmt_contract_lines(value)]
+        return f"{field}:\\n" + "\\n".join(lines)
 
     def _emit(self, line: str) -> None:
         self._buf.append(line)
@@ -76,6 +134,15 @@ class Sol2Mermaid:
         start_id = self._id("START")
         self._emit(f'    {start_id}(["▶ {self._esc(name)}"])')
         self._emit(f"    class {start_id} terminal")
+
+        # Root contracts (SOL 0.6.0): the outer boundary toward whoever invokes the
+        # process. Rendered beside START, like an AGENT's own contract beside its entry.
+        for field in ("accepts", "returns"):
+            if field in sol_doc:
+                info_id = self._id("RC")
+                self._emit(f'    {info_id}["{self._contract_label(field, sol_doc[field])}"]')
+                self._emit(f"    class {info_id} io")
+                self._emit(f"    {start_id} --- {info_id}")
 
         routine = sol_doc.get("ROUTINE", [])
         if routine:
@@ -200,7 +267,7 @@ class Sol2Mermaid:
     def _return(self, instr: dict) -> tuple[str, str]:
         nid = self._id("RETURN")
         msg = instr.get("RETURN")
-        label = f"RETURN: {self._esc(str(msg))}" if msg else "RETURN"
+        label = f"RETURN: {self._esc(fmt_value(msg), 90)}" if msg else "RETURN"
         self._emit(f'    {nid}(["↩️ {label}"])')
         self._emit(f"    class {nid} return")
         return nid, nid
@@ -208,7 +275,7 @@ class Sol2Mermaid:
     def _halt(self, instr: dict) -> tuple[str, str]:
         nid = self._id("HALT")
         msg = instr.get("HALT")
-        label = f"HALT: {self._esc(str(msg))}" if msg else "HALT"
+        label = f"HALT: {self._esc(fmt_value(msg), 90)}" if msg else "HALT"
         self._emit(f'    {nid}(["🛑 {label}"])')
         self._emit(f"    class {nid} halt")
         return nid, nid
@@ -222,14 +289,14 @@ class Sol2Mermaid:
 
     def _import(self, instr: dict) -> tuple[str, str]:
         nid = self._id("IMP")
-        path = self._esc(instr["IMPORT"])
+        path = self._esc(fmt_value(instr["IMPORT"]), 90)
         self._emit(f'    {nid}[("IMPORT: {path}")]')
         self._emit(f"    class {nid} import")
         return nid, nid
 
     def _unknown(self, instr) -> tuple[str, str]:
         nid = self._id("UNK")
-        self._emit(f'    {nid}["{self._esc(str(instr))}"]')
+        self._emit(f'    {nid}["{self._esc(fmt_value(instr), 90)}"]')
         return nid, nid
 
     # ------------------------------------------------------------------
@@ -320,7 +387,7 @@ class Sol2Mermaid:
 
         for key in ("while", "until", "for", "foreach"):
             if key in block:
-                loop_label = f"{key}: {self._esc(str(block[key]))}"
+                loop_label = f"{key}: {self._esc(fmt_value(block[key]))}"
                 loop_type = key
                 break
         else:
@@ -402,7 +469,7 @@ class Sol2Mermaid:
             for field in ("accepts", "returns"):
                 if field in agent:
                     info_id = self._id("AI")
-                    self._emit(f'        {info_id}["{field}: {self._esc(agent[field])}"]')
+                    self._emit(f'        {info_id}["{self._contract_label(field, agent[field])}"]')
                     self._emit(f"        class {info_id} io")
                     self._emit(f"        {entry_id} --- {info_id}")
             ag_routine = agent.get("ROUTINE", [])
@@ -421,9 +488,9 @@ class Sol2Mermaid:
         name = instr["SPAWN"]
         parts = [f"SPAWN: {self._esc(name)}"]
         if "with" in instr:
-            parts.append(f"with: {self._esc(instr['with'], 35)}")
+            parts.append(f"with: {self._esc(fmt_value(instr['with']), 90)}")
         if "returns" in instr:
-            parts.append(f"returns: {self._esc(instr['returns'], 35)}")
+            parts.append(f"returns: {self._esc(fmt_value(instr['returns']), 90)}")
         label = "\\n".join(parts)
         self._emit(f'    {nid}[/"{label}"/]')
         self._emit(f"    class {nid} agent")

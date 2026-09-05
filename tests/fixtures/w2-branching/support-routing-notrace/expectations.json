@@ -1,0 +1,777 @@
+{
+  "fixture": "fixture-w2-support-routing-notrace",
+  "workload_class": "W2",
+  "concern": "control-flow fidelity on a single request decided against an injected world state, decomposed into comprehension / conditional fidelity / end-to-end outcome. Routing is set membership, not arithmetic.",
+  "min_environment": "E0",
+  "oracle": "route_item",
+  "catalog": {
+    "hours_table": {
+      "P1": {
+        "BUG": 3,
+        "FEATURE": 5,
+        "QUESTION": 1
+      },
+      "P2": {
+        "BUG": 2,
+        "FEATURE": 4,
+        "QUESTION": 1
+      },
+      "P3": {
+        "BUG": 2,
+        "FEATURE": 4,
+        "QUESTION": 1
+      },
+      "P4": {
+        "BUG": 3,
+        "FEATURE": 5,
+        "QUESTION": 1
+      },
+      "P5": {
+        "BUG": 3,
+        "FEATURE": 5,
+        "QUESTION": 1
+      }
+    },
+    "teams": [
+      {
+        "id": "T1",
+        "accepts": [
+          "P1",
+          "P2"
+        ],
+        "backs_up": [
+          "P3"
+        ]
+      },
+      {
+        "id": "T2",
+        "accepts": [
+          "P3"
+        ],
+        "backs_up": [
+          "P2",
+          "P5"
+        ]
+      },
+      {
+        "id": "T3",
+        "accepts": [
+          "P5"
+        ],
+        "backs_up": []
+      }
+    ]
+  },
+  "cases": [
+    {
+      "input": "inputs/r00-malformed.json",
+      "structural": true,
+      "rationale": "the request carries no 'remaining_hours' and its item has no 'body' -- the guard must fire before any classification happens",
+      "expected_output": {
+        "status": "INVALID_INPUT",
+        "item": null,
+        "remaining_hours": null
+      }
+    },
+    {
+      "input": "inputs/r01.json",
+      "rationale": "stratum owner-open: P1/BUG against {'T1': 'OPEN', 'T2': 'OPEN', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-041 action=ASSIGN team=T1"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-041",
+          "product": "P1",
+          "intent": "BUG",
+          "hours": 3,
+          "team": "T1",
+          "action": "ASSIGN"
+        },
+        "remaining_hours": 17
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-041",
+          "product": "P1",
+          "intent": "BUG",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r02.json",
+      "rationale": "stratum owner-open: P3/QUESTION against {'T1': 'OPEN', 'T2': 'OPEN', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-173 action=ASSIGN team=T2"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-173",
+          "product": "P3",
+          "intent": "QUESTION",
+          "hours": 1,
+          "team": "T2",
+          "action": "ASSIGN"
+        },
+        "remaining_hours": 19
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-173",
+          "product": "P3",
+          "intent": "QUESTION",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r03.json",
+      "rationale": "stratum owner-open: P5/FEATURE against {'T1': 'OPEN', 'T2': 'OPEN', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-274 action=ASSIGN team=T3"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-274",
+          "product": "P5",
+          "intent": "FEATURE",
+          "hours": 5,
+          "team": "T3",
+          "action": "ASSIGN"
+        },
+        "remaining_hours": 15
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-274",
+          "product": "P5",
+          "intent": "FEATURE",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r04.json",
+      "rationale": "stratum owner-closed-backup: P2/FEATURE against {'T1': 'CLOSED', 'T2': 'OPEN', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "CLOSED",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-084 action=ASSIGN team=T2"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-084",
+          "product": "P2",
+          "intent": "FEATURE",
+          "hours": 4,
+          "team": "T2",
+          "action": "ASSIGN"
+        },
+        "remaining_hours": 16
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-084",
+          "product": "P2",
+          "intent": "FEATURE",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r05.json",
+      "rationale": "stratum owner-closed-backup: P3/BUG against {'T1': 'OPEN', 'T2': 'CLOSED', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "CLOSED",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-137 action=ASSIGN team=T1"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-137",
+          "product": "P3",
+          "intent": "BUG",
+          "hours": 2,
+          "team": "T1",
+          "action": "ASSIGN"
+        },
+        "remaining_hours": 18
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-137",
+          "product": "P3",
+          "intent": "BUG",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r06.json",
+      "rationale": "stratum trap-limited-bug: P2/BUG against {'T1': 'LIMITED', 'T2': 'OPEN', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "LIMITED",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-106 action=ASSIGN team=T1"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-106",
+          "product": "P2",
+          "intent": "BUG",
+          "hours": 2,
+          "team": "T1",
+          "action": "ASSIGN"
+        },
+        "remaining_hours": 18
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-106",
+          "product": "P2",
+          "intent": "BUG",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r07.json",
+      "rationale": "stratum trap-limited-bug: P5/BUG against {'T1': 'OPEN', 'T2': 'OPEN', 'T3': 'LIMITED'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "LIMITED"
+        }
+      },
+      "expected_sequence": [
+        "item=item-285 action=ASSIGN team=T3"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-285",
+          "product": "P5",
+          "intent": "BUG",
+          "hours": 3,
+          "team": "T3",
+          "action": "ASSIGN"
+        },
+        "remaining_hours": 17
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-285",
+          "product": "P5",
+          "intent": "BUG",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r08.json",
+      "rationale": "stratum trap-limited-bug: P3/BUG against {'T1': 'OPEN', 'T2': 'LIMITED', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "LIMITED",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-138 action=ASSIGN team=T2"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-138",
+          "product": "P3",
+          "intent": "BUG",
+          "hours": 2,
+          "team": "T2",
+          "action": "ASSIGN"
+        },
+        "remaining_hours": 18
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-138",
+          "product": "P3",
+          "intent": "BUG",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r09.json",
+      "rationale": "stratum limited-nonbug-backup: P2/FEATURE against {'T1': 'LIMITED', 'T2': 'OPEN', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "LIMITED",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-095 action=ASSIGN team=T2"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-095",
+          "product": "P2",
+          "intent": "FEATURE",
+          "hours": 4,
+          "team": "T2",
+          "action": "ASSIGN"
+        },
+        "remaining_hours": 16
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-095",
+          "product": "P2",
+          "intent": "FEATURE",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r10.json",
+      "rationale": "stratum limited-nonbug-backup: P3/QUESTION against {'T1': 'OPEN', 'T2': 'LIMITED', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "LIMITED",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-177 action=ASSIGN team=T1"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-177",
+          "product": "P3",
+          "intent": "QUESTION",
+          "hours": 1,
+          "team": "T1",
+          "action": "ASSIGN"
+        },
+        "remaining_hours": 19
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-177",
+          "product": "P3",
+          "intent": "QUESTION",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r11.json",
+      "rationale": "stratum no-team-available: P2/BUG against {'T1': 'CLOSED', 'T2': 'CLOSED', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "CLOSED",
+          "T2": "CLOSED",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-067 action=DEFER team=-"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-067",
+          "product": "P2",
+          "intent": "BUG",
+          "hours": 2,
+          "team": null,
+          "action": "DEFER"
+        },
+        "remaining_hours": 20
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-067",
+          "product": "P2",
+          "intent": "BUG",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r12.json",
+      "rationale": "stratum no-team-available: P1/FEATURE against {'T1': 'CLOSED', 'T2': 'OPEN', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "CLOSED",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-040 action=DEFER team=-"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-040",
+          "product": "P1",
+          "intent": "FEATURE",
+          "hours": 5,
+          "team": null,
+          "action": "DEFER"
+        },
+        "remaining_hours": 20
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-040",
+          "product": "P1",
+          "intent": "FEATURE",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r13.json",
+      "rationale": "stratum no-team-available: P5/FEATURE against {'T1': 'OPEN', 'T2': 'LIMITED', 'T3': 'LIMITED'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "LIMITED",
+          "T3": "LIMITED"
+        }
+      },
+      "expected_sequence": [
+        "item=item-263 action=DEFER team=-"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-263",
+          "product": "P5",
+          "intent": "FEATURE",
+          "hours": 5,
+          "team": null,
+          "action": "DEFER"
+        },
+        "remaining_hours": 20
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-263",
+          "product": "P5",
+          "intent": "FEATURE",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r14.json",
+      "rationale": "stratum accepted-by-nobody: P4/BUG against {'T1': 'OPEN', 'T2': 'OPEN', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-231 action=UNASSIGNED team=-"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-231",
+          "product": "P4",
+          "intent": "BUG",
+          "hours": null,
+          "team": null,
+          "action": "UNASSIGNED"
+        },
+        "remaining_hours": 20
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-231",
+          "product": "P4",
+          "intent": "BUG",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r15.json",
+      "rationale": "stratum accepted-by-nobody: P4/FEATURE against {'T1': 'OPEN', 'T2': 'OPEN', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-219 action=UNASSIGNED team=-"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-219",
+          "product": "P4",
+          "intent": "FEATURE",
+          "hours": null,
+          "team": null,
+          "action": "UNASSIGNED"
+        },
+        "remaining_hours": 20
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-219",
+          "product": "P4",
+          "intent": "FEATURE",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r16.json",
+      "rationale": "stratum bug-over-budget: P1/BUG against {'T1': 'OPEN', 'T2': 'OPEN', 'T3': 'OPEN'} with 2h left",
+      "world": {
+        "remaining_hours": 2,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-043 action=ESCALATE team=-"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-043",
+          "product": "P1",
+          "intent": "BUG",
+          "hours": 3,
+          "team": null,
+          "action": "ESCALATE"
+        },
+        "remaining_hours": 2
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-043",
+          "product": "P1",
+          "intent": "BUG",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r17.json",
+      "rationale": "stratum bug-over-budget: P5/BUG against {'T1': 'OPEN', 'T2': 'OPEN', 'T3': 'OPEN'} with 1h left",
+      "world": {
+        "remaining_hours": 1,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-253 action=ESCALATE team=-"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-253",
+          "product": "P5",
+          "intent": "BUG",
+          "hours": 3,
+          "team": null,
+          "action": "ESCALATE"
+        },
+        "remaining_hours": 1
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-253",
+          "product": "P5",
+          "intent": "BUG",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r18.json",
+      "rationale": "stratum nonbug-over-budget: P2/FEATURE against {'T1': 'OPEN', 'T2': 'OPEN', 'T3': 'OPEN'} with 3h left",
+      "world": {
+        "remaining_hours": 3,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-085 action=DEFER team=-"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-085",
+          "product": "P2",
+          "intent": "FEATURE",
+          "hours": 4,
+          "team": null,
+          "action": "DEFER"
+        },
+        "remaining_hours": 3
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-085",
+          "product": "P2",
+          "intent": "FEATURE",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r19.json",
+      "rationale": "stratum nonbug-over-budget: P3/QUESTION against {'T1': 'OPEN', 'T2': 'OPEN', 'T3': 'OPEN'} with 0h left",
+      "world": {
+        "remaining_hours": 0,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-166 action=DEFER team=-"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-166",
+          "product": "P3",
+          "intent": "QUESTION",
+          "hours": 1,
+          "team": null,
+          "action": "DEFER"
+        },
+        "remaining_hours": 0
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-166",
+          "product": "P3",
+          "intent": "QUESTION",
+          "tolerant": false
+        }
+      ]
+    },
+    {
+      "input": "inputs/r20.json",
+      "rationale": "stratum off-catalog: UNKNOWN/QUESTION against {'T1': 'OPEN', 'T2': 'OPEN', 'T3': 'OPEN'} with 20h left",
+      "world": {
+        "remaining_hours": 20,
+        "teams": {
+          "T1": "OPEN",
+          "T2": "OPEN",
+          "T3": "OPEN"
+        }
+      },
+      "expected_sequence": [
+        "item=item-synth-01 action=NEEDS_INFO team=-"
+      ],
+      "expected_output": {
+        "status": "OK",
+        "item": {
+          "id": "item-synth-01",
+          "product": "UNKNOWN",
+          "intent": "QUESTION",
+          "hours": null,
+          "team": null,
+          "action": "NEEDS_INFO"
+        },
+        "remaining_hours": 20
+      },
+      "comprehension_ground_truth": [
+        {
+          "id": "item-synth-01",
+          "product": "UNKNOWN",
+          "intent": "QUESTION",
+          "tolerant": false
+        }
+      ]
+    }
+  ]
+}

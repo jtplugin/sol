@@ -223,7 +223,7 @@ SOL v0.5 introduced first-class AGENT definitions with explicit context boundari
 
 ### Agent-to-Agent Protocol (A2A)
 **Linux Foundation Agentic AI Foundation, v1.0.0 (March 2026)**
-*(Internal research document: `/home/user/sol/doc/research/a2a-protocol.md`)*
+*(Research notes: [`research/a2a-protocol.md`](research/a2a-protocol.md))*
 
 **What the protocol demonstrates:**
 A2A is an emerging standard (backed by 150+ organizations) for communication between AI agents using HTTP + JSON-RPC 2.0. It operates at the agent-to-agent level — complementing MCP (which covers agent-to-tool communication). A2A defines how agents declare their capabilities, accept tasks, and return results across process boundaries.

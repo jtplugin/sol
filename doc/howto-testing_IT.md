@@ -111,7 +111,7 @@ L'API runner chiama direttamente l'API Anthropic Messages — nessuna CLI `claud
 
 | Flag | Default | Descrizione |
 |---|---|---|
-| `--mode` | — | Carica `key`, `url`, `model` da `tests/env.json` (es. `claude-api`) |
+| `--mode` | — | Carica `runner_type`, `url`, `model`, `backend`, `reasoning`, `temperature` da `tests/modes.json` e `key` da `tests/env.json` (es. `claude-api`) |
 | `--api-key` | `$ANTHROPIC_API_KEY` | API key Anthropic (sovrascrive `--mode`) |
 | `--api-url` | `https://api.anthropic.com` | URL base API (sovrascrive `--mode`) |
 
@@ -121,7 +121,7 @@ Tutti gli altri flag (`--fixture`, `--input`, `--all-inputs`, `--context`, `--mo
 
 **Usare `--mode` (consigliato)**
 
-Il modo più semplice per eseguire l'API runner è con `--mode`, che legge credenziali e model da `tests/env.json`:
+Il modo più semplice per eseguire l'API runner è con `--mode`, che legge la configurazione della mode da `tests/modes.json` e la credenziale, se la mode ne richiede una, da `tests/env.json`:
 
 ```bash
 python3 tests/runner/api_executor.py \
@@ -131,17 +131,32 @@ python3 tests/runner/api_executor.py \
   --dry-run
 ```
 
-Struttura di `tests/env.json`:
+**Due file, due mestieri.** `tests/modes.json` è la configurazione delle mode ed è **tracciata in git**: un clone fresco ha tutte le mode pronte. `tests/env.json` contiene solo le chiavi Anthropic ed è **gitignorata**; `tests/env.example.json` ne è il template. Le mode locali (`backend` `openai`/`ollama`) e `claude-code-local` non hanno alcuna entry lì.
+
+Struttura di `tests/modes.json` (`runner_type`, `backend`, `url`, `model`, `reasoning`, più `temperature`/`thinking`/`ctx_size`/`kv_cache_type`/`n_parallel` dove la mode li usa — un campo omesso resta non impostato, `"thinking": false` non equivale ad assente):
 
 ```json
 {
   "modes": [
     {
       "mode": "claude-api",
-      "key":  "sk-ant-...",
+      "runner_type": "api",
+      "backend": "anthropic",
       "url":  "https://api.anthropic.com",
-      "model": "claude-opus-4-8"
+      "model": "claude-sonnet-4-6",
+      "reasoning": 0
     }
+  ]
+}
+```
+
+Struttura di `tests/env.json` — sole credenziali, una entry per ogni mode che richiede una chiave:
+
+```json
+{
+  "modes": [
+    { "mode": "claude-api",          "key": "sk-ant-api03-..." },
+    { "mode": "claude-api-thinking", "key": "sk-ant-api03-..." }
   ]
 }
 ```

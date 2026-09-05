@@ -1,0 +1,80 @@
+{
+  "fixture": "fixture-w0-polarity-flip",
+  "cases": [
+    {
+      "input": "inputs/i1-affirmative",
+      "rationale": "affirmative input -- flip adds the 'does not' auxiliary and the verb stays in base form",
+      "expected_sequence": [
+        "parse",
+        "flip"
+      ],
+      "expected_output": {
+        "subject": "the auditor",
+        "verb": "read",
+        "object": "the report",
+        "polarity": "affirmative",
+        "flipped": "the auditor does not read the report"
+      }
+    },
+    {
+      "input": "inputs/i2-negative",
+      "rationale": "negative input, base verb ends in a plain consonant -- third person adds 's'",
+      "expected_sequence": [
+        "parse",
+        "flip"
+      ],
+      "expected_output": {
+        "subject": "the auditor",
+        "verb": "read",
+        "object": "the report",
+        "polarity": "negative",
+        "flipped": "the auditor reads the report"
+      }
+    },
+    {
+      "input": "inputs/i3-sibilant",
+      "rationale": "base verb ends in 'x' -- third person adds 'es', not 's'",
+      "expected_sequence": [
+        "parse",
+        "flip"
+      ],
+      "expected_output": {
+        "subject": "the clerk",
+        "verb": "fix",
+        "object": "the invoice",
+        "polarity": "negative",
+        "flipped": "the clerk fixes the invoice"
+      }
+    },
+    {
+      "input": "inputs/i4-consonant-y",
+      "rationale": "final 'y' preceded by a consonant -- becomes 'ies'",
+      "expected_sequence": [
+        "parse",
+        "flip"
+      ],
+      "expected_output": {
+        "subject": "the courier",
+        "verb": "carry",
+        "object": "the parcel",
+        "polarity": "negative",
+        "flipped": "the courier carries the parcel"
+      }
+    },
+    {
+      "input": "inputs/i5-vowel-y",
+      "rationale": "final 'y' preceded by a vowel -- falls through to the plain 's' rule, the case that separates a model applying the rule from one pattern-matching on 'y'",
+      "expected_sequence": [
+        "parse",
+        "flip"
+      ],
+      "expected_output": {
+        "subject": "the intern",
+        "verb": "delay",
+        "object": "the shipment",
+        "polarity": "negative",
+        "flipped": "the intern delays the shipment"
+      }
+    }
+  ]
+}

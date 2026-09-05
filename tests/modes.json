@@ -1,0 +1,137 @@
+{
+  "_comment": "tests/modes.json is the single source of the mode configuration (runner_type, backend, url, model, reasoning, temperature, thinking, ctx_size, kv_cache_type, n_parallel) and is tracked in git -- reconstructible from a fresh clone. tests/env.json holds only the Anthropic credentials (mode + key) and stays gitignored; tests/env.example.json is its template. No 'key' field belongs here.",
+  "modes": [
+    {
+      "mode": "claude-api",
+      "runner_type": "api",
+      "backend": "anthropic",
+      "url": "https://api.anthropic.com",
+      "model": "claude-sonnet-4-6",
+      "reasoning": 0
+    },
+    {
+      "mode": "claude-api-thinking",
+      "runner_type": "api",
+      "backend": "anthropic",
+      "url": "https://api.anthropic.com",
+      "model": "claude-sonnet-4-6",
+      "reasoning": 8000
+    },
+    {
+      "mode": "claude-code-local",
+      "runner_type": "claude-code",
+      "backend": "anthropic",
+      "url": "",
+      "model": "claude-opus-4-8",
+      "reasoning": 0
+    },
+    {
+      "_comment": "2026-08-31: the frontier arm of the routing-notrace block -- the campaign's own everyday use case, `claude -p --model <id>`, run on Haiku 4.5 as a term of comparison for the six local cells. No 'key' belongs in env.json for it: runner_type 'claude-code' authenticates on the Claude Code session, which is also why it bills against the subscription and not against API credit. url is empty for the same reason as claude-code-local -- there is no endpoint the runner talks to; campaign._invoke_claude_code drives the CLI. 'reasoning' is 0 because the CLI exposes no thinking-budget flag, NOT because the model does not think: a trivial probe on 2026-08-31 came back with 100 thinking tokens, so whatever Claude Code decides to do is part of what this arm measures. Same reading for ctx_size/kv_cache_type/n_parallel, absent here: they are llama-server launch parameters and this cell starts no server.",
+      "mode": "claude-code-haiku",
+      "runner_type": "claude-code",
+      "backend": "anthropic",
+      "url": "",
+      "model": "claude-haiku-4-5",
+      "reasoning": 0
+    },
+    {
+      "_comment": "2026-09-01: the second rung of the hosted ladder, planned before any row of it ran. Same block shape as claude-code-haiku and the same three flags (--safe-mode, --system-prompt, --tools \"\") -- only the model id differs, which is the whole point of the arm. Sonnet 5 and Opus 5 are the current top two tiers as this project invokes them today; there is no Haiku 5, so the ladder is haiku-4-5 / sonnet-5 / opus-5 and NOT a same-generation family sweep. Everything §5.3 says about the haiku cell holds unchanged here: no key in env.json (the CLI authenticates on the Claude Code session and bills the subscription), url empty (no endpoint -- campaign._invoke_claude_code drives the CLI), reasoning 0 because the CLI exposes no thinking-budget flag and NOT because the model does not think, no ctx_size/kv_cache_type/n_parallel because the cell starts no llama-server.",
+      "mode": "claude-code-sonnet",
+      "runner_type": "claude-code",
+      "backend": "anthropic",
+      "url": "",
+      "model": "claude-sonnet-5",
+      "reasoning": 0
+    },
+    {
+      "_comment": "2026-09-01: the third rung. See claude-code-sonnet for the shared rationale. Note that claude-code-local already names an Opus id (claude-opus-4-8) and is a different thing: it is the interactive local runner of runner_type claude-code used outside the campaign grid, and no block reads a cell for it.",
+      "mode": "claude-code-opus",
+      "runner_type": "claude-code",
+      "backend": "anthropic",
+      "url": "",
+      "model": "claude-opus-5",
+      "reasoning": 0
+    },
+    {
+      "_comment": "llama-server.exe (C:\\srv\\llama, CUDA), NOT LM Studio -- corrected 2026-08-17 during the pilot card (004): the lmstudio-* placeholders written 2026-08-03 pointed at localhost:1234/LM Studio, never actually reachable. Real engine: llama-server.exe -m ai-models/<file>.gguf --port 8090 -ngl 999 -np 1 --ctx-size 32768 (single slot: KV cache is not worth quadrupling for a single-request pilot/campaign). model id verified via GET /v1/models. Temperature 0.2 frozen for the whole campaign (doc/experiment-minimum-context.md SS5.5). Backend 'openai' talks to llama-server's OpenAI-compatible /v1/chat/completions, E0 only. reasoning=12000 -- Qwen3.5-9B is a thinking model that always writes to reasoning_content (verified: 165 tokens of reasoning_content for a trivial 2+2 prompt); the runner's parser reads only `content`, so a tight max_tokens truncates before the model reaches its final answer and the run reads as a garbled/empty response, not a model failure. effective max_tokens = max(4096, reasoning+1024) per api_executor.py -- this field does not enable/disable thinking (always on for this model), it only widens the completion budget so thinking doesn't starve the final content. The 2026-08-19 revision: primary model per Gianni's 2026-08-18 decision -- split into -think/-nothink modes below to isolate the `thinking` factor (chat_template_kwargs.enable_thinking) from the always-on reasoning_content behaviour described above; both keep reasoning=12000 unchanged (orthogonal completion-widening budget, not the thinking toggle).",
+      "mode": "llama-qwen3.5-9b-think",
+      "runner_type": "api",
+      "backend": "openai",
+      "url": "http://localhost:8090",
+      "model": "ai-models/Qwen3.5-9B-Q4_K_M.gguf",
+      "reasoning": 12000,
+      "temperature": 0.2,
+      "thinking": true,
+      "ctx_size": 51200,
+      "kv_cache_type": "q8_0",
+      "n_parallel": 1
+    },
+    {
+      "_comment": "The 2026-08-19 revision: same cell as llama-qwen3.5-9b-think, thinking factor set to false (chat_template_kwargs.enable_thinking=false) -- see llama-qwen3.5-9b-think comment for the reasoning=12000 rationale (unchanged, orthogonal).",
+      "mode": "llama-qwen3.5-9b-nothink",
+      "runner_type": "api",
+      "backend": "openai",
+      "url": "http://localhost:8090",
+      "model": "ai-models/Qwen3.5-9B-Q4_K_M.gguf",
+      "reasoning": 12000,
+      "temperature": 0.2,
+      "thinking": false,
+      "ctx_size": 51200,
+      "kv_cache_type": "q8_0",
+      "n_parallel": 1
+    },
+    {
+      "_comment": "second model family (not Qwen), fills the VRAM slot Qwen3.5-9B occupies when swapped out -- one llama-server instance at a time on port 8090. Non-thinking model (no reasoning_content observed), reasoning=0.",
+      "mode": "llama-ministral-8b",
+      "runner_type": "api",
+      "backend": "openai",
+      "url": "http://localhost:8090",
+      "model": "ai-models/Ministral-3-8B-Instruct-2512-Q4_K_M.gguf",
+      "reasoning": 0,
+      "temperature": 0.2,
+      "ctx_size": 38912,
+      "kv_cache_type": "q8_0",
+      "n_parallel": 1
+    },
+    {
+      "_comment": "fast tier -- Phi-4-mini (~3.8B), non-thinking, reasoning=0.",
+      "mode": "llama-phi4-mini",
+      "runner_type": "api",
+      "backend": "openai",
+      "url": "http://localhost:8090",
+      "model": "ai-models/Phi-4-mini-instruct-Q4_K_M.gguf",
+      "reasoning": 0,
+      "temperature": 0.2,
+      "ctx_size": 43008,
+      "kv_cache_type": "q8_0",
+      "n_parallel": 1
+    },
+    {
+      "_comment": "The 2026-08-19 revision: new cell, same defect measured as Qwen3.5-9B (Gruppo 1) but not 'primary' (FR-14) -- single mode, thinking fixed to false (direct fix, not an experimental factor). Model id NOT verified via GET /v1/models (Scope/Escluso of the 2026-08-19 revision) -- placeholder, same caveat pattern as llama-qwen3.5-9b above; verify against the loaded llama-server instance before trusting it.",
+      "mode": "llama-gemma-4-12b",
+      "runner_type": "api",
+      "backend": "openai",
+      "url": "http://localhost:8090",
+      "model": "ai-models/gemma-4-12b-it-qat-UD-Q4_K_L.gguf",
+      "reasoning": 0,
+      "temperature": 0.2,
+      "thinking": false,
+      "ctx_size": 43008,
+      "kv_cache_type": "q8_0",
+      "n_parallel": 1
+    },
+    {
+      "_comment": "The 2026-08-19 revision: new cell, non-reasoning model -- `thinking` key omitted entirely (FR-15: not false, absent -- same as today's untouched behaviour). Model id NOT verified via GET /v1/models (Scope/Escluso of the 2026-08-19 revision) -- placeholder, same caveat pattern as llama-qwen3.5-9b above; verify against the loaded llama-server instance before trusting it.",
+      "mode": "llama-granite-4.1-8b",
+      "runner_type": "api",
+      "backend": "openai",
+      "url": "http://localhost:8090",
+      "model": "ai-models/granite-4.1-8b-Q4_K_M.gguf",
+      "reasoning": 0,
+      "temperature": 0.2,
+      "ctx_size": 28672,
+      "kv_cache_type": "q8_0",
+      "n_parallel": 1
+    }
+  ]
+}

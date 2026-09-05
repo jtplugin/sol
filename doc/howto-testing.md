@@ -114,7 +114,7 @@ and benchmarks that need to be independent of the local Claude Code installation
 
 | Flag | Default | Description |
 |---|---|---|
-| `--mode` | — | Load `key`, `url`, `model`, `backend`, `temperature` from `tests/env.json` (e.g. `claude-api`) |
+| `--mode` | — | Load `runner_type`, `url`, `model`, `backend`, `reasoning`, `temperature` from `tests/modes.json`, and `key` from `tests/env.json` (e.g. `claude-api`) |
 | `--api-key` | `$ANTHROPIC_API_KEY` | Anthropic API key (overrides `--mode`) |
 | `--api-url` | `https://api.anthropic.com` | API base URL (overrides `--mode`) |
 | `--backend` | `anthropic` | `anthropic` \| `ollama` \| `openai` (LM Studio's native `/v1/chat/completions`) |
@@ -122,8 +122,8 @@ and benchmarks that need to be independent of the local Claude Code installation
 
 **LM Studio (`backend: "openai"`)** — E0 only, same restriction as `ollama`. Start the LM
 Studio local server (Developer tab -> Start Server), check the exact model identifier under
-`GET /v1/models`, and set `url`/`model` in `tests/env.json` accordingly. See
-`tests/env.example.json` for a template entry.
+`GET /v1/models`, and set `url`/`model` in `tests/modes.json` accordingly — a local backend
+needs no key, so nothing goes in `tests/env.json`.
 
 All other flags (`--fixture`, `--input`, `--all-inputs`, `--context`, `--model`,
 `--runs`, `--timeout`, `--dry-run`) work identically to the session runner.
@@ -133,8 +133,9 @@ API calls are the natural mode of the API runner.
 
 **Using `--mode` (recommended)**
 
-The simplest way to run the API executor is with `--mode`, which reads credentials
-and model from `tests/env.json`:
+The simplest way to run the API executor is with `--mode`, which reads the mode
+configuration from `tests/modes.json` and the credential, if the mode needs one,
+from `tests/env.json`:
 
 ```bash
 python3 tests/runner/api_executor.py \
@@ -144,17 +145,39 @@ python3 tests/runner/api_executor.py \
   --dry-run
 ```
 
-`tests/env.json` structure:
+**Two files, two jobs.** `tests/modes.json` is the mode configuration and is
+**tracked in git**: a fresh clone has every mode ready to run. `tests/env.json`
+holds nothing but the Anthropic keys and is **gitignored**; `tests/env.example.json`
+is its template. Local modes (`backend` `openai`/`ollama`) and `claude-code-local`
+need no entry there at all.
+
+`tests/modes.json` structure (`runner_type`, `backend`, `url`, `model`, `reasoning`,
+plus `temperature`/`thinking`/`ctx_size`/`kv_cache_type`/`n_parallel` where the mode
+uses them — omit a field to leave it unset, `"thinking": false` is not the same as
+absent):
 
 ```json
 {
   "modes": [
     {
       "mode": "claude-api",
-      "key":  "sk-ant-...",
+      "runner_type": "api",
+      "backend": "anthropic",
       "url":  "https://api.anthropic.com",
-      "model": "claude-opus-4-8"
+      "model": "claude-sonnet-4-6",
+      "reasoning": 0
     }
+  ]
+}
+```
+
+`tests/env.json` structure — credentials only, one entry per mode that needs a key:
+
+```json
+{
+  "modes": [
+    { "mode": "claude-api",          "key": "sk-ant-api03-..." },
+    { "mode": "claude-api-thinking", "key": "sk-ant-api03-..." }
   ]
 }
 ```

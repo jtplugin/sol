@@ -1,0 +1,29 @@
+{
+  "_comment": "Frozen fixture data (SS8.1 item 8 of doc/experiment-minimum-context.md). The five product personas, the product_to_repo mapping and hours_table are copied verbatim from w2-branching/support-intake so the two fixtures stay comparable: the same item classified the same way costs the same hours in both. The repo mapping is NEVER shown to the model -- only the personas are, through the SOL document -- and exists here for offline ground-truth computation. What is new is `teams`: each team accepts a fixed set of products and stands as backup on another, and P4 appears in neither list for any team, which is the structural gap that produces UNASSIGNED. There is deliberately no budget_hours: the hour budget is injected per request as `remaining_hours` in the payload, computed by the oracle, never chained from the model's own previous answer (SS4.5).",
+  "product_to_repo": {
+    "P1": "bitcoin/bitcoin",
+    "P2": "facebook/react",
+    "P3": "microsoft/vscode",
+    "P4": "opencv/opencv",
+    "P5": "tensorflow/tensorflow"
+  },
+  "products": [
+    { "id": "P1", "name": "Solidus",  "persona": "a cryptocurrency full-node and wallet client: consensus rules, peer-to-peer networking, transaction relay, wallet key management." },
+    { "id": "P2", "name": "Lucent",   "persona": "a JavaScript library for building user interfaces: component rendering, the virtual DOM, hooks, server-side rendering." },
+    { "id": "P3", "name": "Meridian", "persona": "a cross-platform source code editor: the text-editing core, extensions/plugins, debugging integration, the integrated terminal." },
+    { "id": "P4", "name": "Aperture", "persona": "a computer-vision and image-processing library: image I/O, filters and transforms, camera calibration, video analysis." },
+    { "id": "P5", "name": "Tensora",  "persona": "a machine-learning framework: tensor operations, automatic differentiation, model training and serving, GPU/accelerator support." }
+  ],
+  "hours_table": {
+    "P1": { "BUG": 3, "FEATURE": 5, "QUESTION": 1 },
+    "P2": { "BUG": 2, "FEATURE": 4, "QUESTION": 1 },
+    "P3": { "BUG": 2, "FEATURE": 4, "QUESTION": 1 },
+    "P4": { "BUG": 3, "FEATURE": 5, "QUESTION": 1 },
+    "P5": { "BUG": 3, "FEATURE": 5, "QUESTION": 1 }
+  },
+  "teams": [
+    { "id": "T1", "accepts": ["P1", "P2"], "backs_up": ["P3"] },
+    { "id": "T2", "accepts": ["P3"],       "backs_up": ["P2", "P5"] },
+    { "id": "T3", "accepts": ["P5"],       "backs_up": [] }
+  ]
+}

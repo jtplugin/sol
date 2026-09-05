@@ -272,9 +272,9 @@ Look for defects that are “valid JSON” but non-compliant with the authoring 
 
 ---
 
-## Offer a diagram
+## Offer a diagram or a prose rendering
 
-After the files are generated, offer the user a diagram:
+After the files are generated, offer the user a derived view:
 
 - **Mermaid** flowchart (`.mmd`, renderable at [mermaid.live](https://mermaid.live)):
 
@@ -289,8 +289,22 @@ After the files are generated, offer the user a diagram:
   python3 scripts/sol2drawio.py <file.json> [output.drawio]
   ```
 
+- **Prose** narrative (`.prose.md`), the process restated in plain language in execution
+  order — the inverse of Pass 0:
+
+  ```bash
+  python3 scripts/sol2prose.py <file.json|file.md> [output.md] [--lang en|it]
+  ```
+
 For multi-file output, default to the main entry point unless the user names a file. If a
-script is missing or Python is unavailable, generate the diagram manually from the SOL JSON.
+script is missing or Python is unavailable, generate the view manually from the SOL JSON.
+
+**The prose rendering is a check, not a deliverable.** Its purpose is round-trip validation:
+the author reads back in plain language what they wrote in JSON. If the narrative says
+something other than what was meant, the SOL is wrong — fix the script, not the prose (which
+is regenerated, never edited). It quotes every leaf verbatim and never translates: only the
+connective scaffolding follows `--lang`. It renders and does not judge — correctness findings
+remain the linter's job (Pass 8).
 
 ---
 
@@ -305,6 +319,7 @@ script is missing or Python is unavailable, generate the diagram manually from t
 | `guides/translation.md` | Translation-specific guidance: input format mapping, extraction checklist, common patterns |
 | `guides/sol-vs-prose.md` | When a process belongs in SOL vs prose; why this skill is prose; why json-in-md is a good pattern |
 | `scripts/sol-lint.py` | Deterministic linter: the mechanical half of Pass 7/8. ERRORs = formal defects (single-brace placeholders, unresolved CALL/SPAWN, RETURN keys vs structured `returns`, malformed constructs); WARNs = heuristic smells (buried flow, value-only duplicated SUBs, missing ONERROR, string RETURN under structured `returns`). Lints a `.json` file or the `json` fences inside a `.md` |
+| `scripts/sol2prose.py` | Renders a SOL file (or the `json` fences in a `.md`) as narrative prose in execution order — the inverse of Pass 0, for round-trip validation. Leaves verbatim; `--lang` templates only the scaffolding |
 | `scripts/sol2mermaid.py` | Converts a SOL JSON file to a Mermaid flowchart |
 | `scripts/sol2drawio.py` | Converts a SOL JSON file to a draw.io XML diagram |
 

@@ -5,7 +5,7 @@ SOL API executor — runs a fixture case N times via a model HTTP backend.
 Uses an API key + base URL directly instead of the `claude -p` CLI, so it works
 with any Anthropic-compatible endpoint and does not require a Claude Code session.
 
-Backends (--backend, or "backend" field per mode in tests/env.json):
+Backends (--backend, or "backend" field per mode in tests/modes.json):
   anthropic — Anthropic Messages API (default); supports E0 and E1.
   ollama    — local Ollama /api/generate; E0 only (no Anthropic tool loop).
               No auth by default; a key, if given, is forwarded as a Bearer token.
@@ -62,6 +62,7 @@ if hasattr(sys.stderr, "reconfigure"):
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENV_PATH  = REPO_ROOT / "tests" / "env.json"
+MODES_PATH = REPO_ROOT / "tests" / "modes.json"
 sys.path.insert(0, str(REPO_ROOT / "tests"))
 
 from runner.schema import Config, Execution, Output, RunRecord, Trace, Usage
@@ -72,6 +73,7 @@ from runner.runner import (
     _load_fixture, _load_input, _stage,
     _record_path, _score_path, _append_index,
     _parse_trace, _extract_payload,
+    L1_INSTRUCTION,
 )
 
 DEFAULT_TIMEOUT_S  = 300
@@ -184,10 +186,19 @@ def _post_messages_openai(api_url: str, model: str, messages: list, max_tokens: 
         raise RuntimeError(f"OpenAI-compatible API error {e.code}: {body}") from e
 
     choice = (out.get("choices") or [{}])[0]
-    text = (choice.get("message") or {}).get("content", "")
+    message = choice.get("message") or {}
+    text = message.get("content", "")
+    # llama-server hands the thinking block back in its own field when the chat
+    # template separates it. Reading only `content` made a model that spent its
+    # whole budget deliberating indistinguishable from one that returned nothing
+    # -- 4 of MAIN's first 5 rows, 13,024 output tokens each, all recorded as
+    # no-output. Kept for diagnosis, never merged into the answer: the SOL
+    # contract asks for the payload, and deliberating is not delivering.
+    reasoning = message.get("reasoning_content") or message.get("reasoning") or ""
     usage = out.get("usage") or {}
     return {
         "stop_reason": choice.get("finish_reason", "stop"),
+        "reasoning": reasoning,
         "content": [{"type": "text", "text": text}],
         "usage": {
             "input_tokens": usage.get("prompt_tokens"),
@@ -386,16 +397,18 @@ def _list_inputs(fixture_dir: Path) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# Predictability-layer scale (--level)
+# Collateral-context scale (--level), doc/experiment-minimum-context.md SS5.1
+#
+# These are the LEVELS L0-L4 of the L factor. They are not the predictability
+# LAYERS of doc/predictability-strategies.md -- the whole L0-L4 scale is an
+# empirical calibration of a single one of those layers (the L1 "Linguistic"
+# one). Same letters, two taxonomies; conflating them was the bug this scale
+# was realigned to fix, on 2026-08-22.
 # ---------------------------------------------------------------------------
 
-_LEVEL_LAYERS = {
-    "L0": [],
-    "L1": ["L1"],
-    "L2": ["L1", "L2"],
-    "L3": ["L1", "L2", "L3"],
-    "L4": ["L1", "L2", "L3", "L4"],
-}
+LEVELS = ("L0", "L1", "L2", "L3", "L4")
+PROSE = ("prose-mechanical", "prose-generated")
+RENDERINGS = LEVELS + PROSE
 
 EXAMPLES_DIR = REPO_ROOT / "examples"
 L4_EXAMPLE_FILES = [
@@ -406,11 +419,11 @@ L4_EXAMPLE_FILES = [
 ]
 
 
-def _layers_for_level(level: str) -> list[str]:
-    """Cumulative predictability-layer list for --level. Unrecognized values
-    fall back to L1 (mirrors _build_prompt_e0's fallback — never a crash
-    mid-cell)."""
-    return _LEVEL_LAYERS.get(level, _LEVEL_LAYERS["L1"])
+def _normalize_rendering(rendering: str) -> str:
+    """The level actually applied, for the record. Unrecognized values fall back
+    to L1 (mirrors _build_prompt_e0's fallback — never a crash mid-cell), and the
+    record must say L1, because L1 is what the model was given."""
+    return rendering if rendering in RENDERINGS else "L1"
 
 
 # ---------------------------------------------------------------------------
@@ -418,25 +431,45 @@ def _layers_for_level(level: str) -> list[str]:
 # ---------------------------------------------------------------------------
 
 def _build_prompt_e0(sol_doc: dict, bundle: InputBundle, fixture_body: str,
-                     level: str = "L1") -> str:
+                     level: str = "L1", prose_bodies: dict | None = None) -> str:
     """E0: no tools — file content injected into the markdown fixture template.
 
-    Cumulative predictability-layer scale (--level):
-      L0 — only the rendered file content, no fixture template, no instructions.
-      L1 — today's output: fixture_body with placeholders substituted (default,
-           byte-for-byte non-regression target, see tests/toolchain/test_level_l.py).
+    Cumulative collateral-context scale (--level), SS5.1 of the protocol.
+    What varies across levels is the EXPLANATION of how SOL is read; what the
+    task needs in order to be executable at all — the input data and the SOL
+    script itself — is present at every level, L0 included. Each level is a
+    strict prefix of the next.
+      L0 — fixture_body with placeholders substituted: input data + the SOL
+           script, and no prose explaining either.
+      L1 — L0 + the minimal instruction, verbatim (default).
       L2 — L1 + l2-glossary.md appended.
       L3 — L2 + spec/sol-0.6.md appended.
       L4 — L3 + each examples/*.json appended, alphabetical order.
     Unrecognized level -> fallback to L1 behavior (never a crash mid-cell).
     """
+    if level in PROSE:
+        # SS5.4: a prose rendering REPLACES the SOL document, it does not
+        # extend it, so no L collateral applies -- the prose document, with
+        # the input substituted, is the whole prompt. A missing document is
+        # refused, never fallen back on: a SOL prompt filed under a prose
+        # cell would be a measurement of SOL recorded as one of prose.
+        prose_body = (prose_bodies or {}).get(level)
+        if not prose_body:
+            raise FileNotFoundError(
+                f"no {level} document for this fixture; expected a file "
+                f"named <fixture>-{level}.md beside the SOL document")
+        if bundle.mode == "single":
+            return prose_body.replace(
+                "{{file_content}}",
+                json.dumps(bundle.payload, indent=2, ensure_ascii=False))
+        for stem, text in bundle.files.items():
+            prose_body = prose_body.replace("{{" + stem + "}}", text)
+        return prose_body
+
     if bundle.mode == "single":
         fc = json.dumps(bundle.payload, indent=2, ensure_ascii=False)
     else:
         fc = "\n".join(bundle.files.values())
-
-    if level == "L0":
-        return fc
 
     body = fixture_body
     if bundle.mode == "single":
@@ -444,6 +477,11 @@ def _build_prompt_e0(sol_doc: dict, bundle: InputBundle, fixture_body: str,
     else:
         for stem, text in bundle.files.items():
             body = body.replace("{{" + stem + "}}", text)
+
+    if level == "L0":
+        return body
+
+    body = body + "\n\n" + L1_INSTRUCTION
 
     if level not in ("L2", "L3", "L4"):
         return body
@@ -552,10 +590,16 @@ def _run_tool_loop(
     system_prompt: str = "",
     temperature: float | None = None,
     thinking: bool | None = None,
-) -> tuple[str, list]:
-    """Run an agentic loop for E1 context. Returns (full_text, usage_list)."""
+) -> tuple[str, list, str, str]:
+    """Run an agentic loop for E1 context.
+
+    Returns (full_text, usage_list, reasoning, stop_reason). Every turn's
+    reasoning is concatenated and the LAST stop_reason kept: that is the one
+    that ended the loop, and the only one that can say the budget ran out."""
     all_text:  list[str] = []
     usage_list: list[dict] = []
+    all_reasoning: list[str] = []
+    stop_reason = "end_turn"
 
     for _ in range(MAX_TOOL_ITERS):
         effective_max_tokens = max(DEFAULT_MAX_TOKENS, reasoning_budget + 1024) if reasoning_budget > 0 else DEFAULT_MAX_TOKENS
@@ -567,6 +611,8 @@ def _run_tool_loop(
         content   = resp.get("content", [])
         stop_reason = resp.get("stop_reason", "end_turn")
 
+        if resp.get("reasoning"):
+            all_reasoning.append(resp["reasoning"])
         text = _text_from_content(content)
         if text:
             all_text.append(text)
@@ -597,7 +643,8 @@ def _run_tool_loop(
         else:
             break
 
-    return "\n".join(all_text), usage_list
+    return ("\n".join(all_text), usage_list,
+            "\n".join(all_reasoning), stop_reason)
 
 
 def _classify_exc(exc: Exception) -> str:
@@ -644,7 +691,8 @@ def _invoke_api(
     system_prompt = meta.get("system_prompt", "")
 
     if context == "E0":
-        prompt = _build_prompt_e0(sol_doc, bundle, fixture_body, level=level)
+        prompt = _build_prompt_e0(sol_doc, bundle, fixture_body, level=level,
+                                  prose_bodies=(fixture_meta or {}).get("prose"))
         messages = [{"role": "user", "content": prompt}]
         effective_max_tokens = max(DEFAULT_MAX_TOKENS, reasoning_budget + 1024) if reasoning_budget > 0 else DEFAULT_MAX_TOKENS
         try:
@@ -665,13 +713,15 @@ def _invoke_api(
             "tokens_out": usage.get("output_tokens"),
             "cost":       None,
             "request_messages": messages,
+            "reasoning":   resp.get("reasoning", ""),
+            "stop_reason": resp.get("stop_reason"),
         }
     else:
         # E1: tool loop
         prompt = _build_prompt_e1(sol_doc, staged_path)
         messages = [{"role": "user", "content": prompt}]
         try:
-            raw_text, usage_list = _run_tool_loop(
+            raw_text, usage_list, reasoning, stop_reason = _run_tool_loop(
                 api_key, api_url, model, messages, sandbox, timeout_s,
                 reasoning_budget=reasoning_budget, system_prompt=system_prompt,
                 temperature=temperature, thinking=thinking,
@@ -684,7 +734,8 @@ def _invoke_api(
         tokens_in  = sum(u.get("input_tokens",  0) for u in usage_list) or None
         tokens_out = sum(u.get("output_tokens", 0) for u in usage_list) or None
         extras = {"tokens_in": tokens_in, "tokens_out": tokens_out, "cost": None,
-                  "request_messages": messages}
+                  "request_messages": messages,
+                  "reasoning": reasoning, "stop_reason": stop_reason}
 
     return (
         "done",
@@ -729,6 +780,7 @@ def run_headless_api(
     kv_cache_type: str | None = None,
     n_parallel: int | None = None,
     level: str = "L1",
+    mode: str = "",
 ) -> None:
     if backend in ("ollama", "openai") and context != "E0":
         sys.exit(
@@ -820,7 +872,8 @@ def run_headless_api(
                 ctx_size=ctx_size,
                 kv_cache_type=kv_cache_type,
                 n_parallel=n_parallel,
-                predictability_layers=_layers_for_level(level),
+                process_rendering=_normalize_rendering(level),
+                mode=mode,
             )
             record = RunRecord(
                 run_id=run_id,
@@ -828,11 +881,13 @@ def run_headless_api(
                 config=config,
                 staged_input_id=input_id,
                 execution=Execution(
+                    stop_reason=extras.get("stop_reason"),
                     status=status,
                     wall_clock_ms=elapsed_ms if status == "done" else None,
                 ),
                 trace=Trace(steps=steps, request_messages=extras.get("request_messages", [])),
                 output=Output(
+                    reasoning=extras.get("reasoning", ""),
                     raw=raw,
                     returned_payload=payload if status == "done" else None,
                 ),
@@ -903,8 +958,71 @@ def _regen_dashboard() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Mode helper (reads tests/env.json)
+# Mode helper (reads tests/modes.json + tests/env.json)
 # ---------------------------------------------------------------------------
+
+def _load_mode_entry(mode: str) -> dict:
+    """The single reader of tests/modes.json and tests/env.json: return the
+    entry for `mode`, with the Anthropic key grafted in when there is one.
+
+    Every other mode accessor in the repo is a projection over this
+    function — _load_mode below, run._load_env_entry, and
+    scripts/preprocess_p2a._load_mode. Three parsers with three field lists
+    meant a field added to the mode config (the 2026-08-19 revision's thinking/ctx_size/
+    kv_cache_type/n_parallel) reached only the entrypoint someone remembered
+    to wire.
+
+    The configuration lives in tests/modes.json (tracked) and the
+    credentials in tests/env.json (gitignored). modes.json missing or invalid
+    is fatal; env.json missing, invalid or silent about `mode` is not — the
+    entry comes back without a `key` and the guard in _load_mode decides
+    whether that is an error. That is what lets a fresh clone run every local
+    mode with no credentials at all.
+    """
+    if not MODES_PATH.exists():
+        sys.exit(f"modes.json not found at {MODES_PATH}")
+    try:
+        modes = json.loads(MODES_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        sys.exit(f"modes.json is not valid JSON: {exc}")
+    entries = modes.get("modes", [])
+    found = None
+    for candidate in entries:
+        if candidate.get("mode") == mode:
+            found = candidate
+            break
+    if found is None:
+        known = [e.get("mode") for e in entries]
+        sys.exit(f"Mode '{mode}' not found in modes.json. Available: {known}")
+
+    # Copy, never the loaded reference: campaign._mode_config caches entries by
+    # mode name, and grafting the key into the shared dict would contaminate it.
+    entry = dict(found)
+    if entry.get("backend") == "anthropic":
+        key = _load_mode_key(mode)
+        if key:
+            entry["key"] = key
+    return entry
+
+
+def _load_mode_key(mode: str) -> str:
+    """Return the credential for `mode` from tests/env.json, or "" .
+
+    Every failure is non-fatal by design (file absent, invalid JSON, mode not
+    declared, empty key): the caller returns an entry without a key and the
+    guard in _load_mode is the one place that decides if that is fatal.
+    """
+    if not ENV_PATH.exists():
+        return ""
+    try:
+        env = json.loads(ENV_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return ""
+    for entry in env.get("modes", []):
+        if entry.get("mode") == mode:
+            return entry.get("key", "") or ""
+    return ""
+
 
 def _load_mode(mode: str) -> tuple[
     str, str, str, str, int, float | None,
@@ -912,35 +1030,31 @@ def _load_mode(mode: str) -> tuple[
 ]:
     """Return (api_key, api_url, model, backend, reasoning_budget, temperature,
     thinking, ctx_size, kv_cache_type, n_parallel) for the named mode entry in
-    tests/env.json. The last four are None when absent from the entry."""
-    if not ENV_PATH.exists():
-        sys.exit(f"env.json not found at {ENV_PATH}")
-    try:
-        env = json.loads(ENV_PATH.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
-        sys.exit(f"env.json is not valid JSON: {exc}")
-    entries = env.get("modes", [])
-    for entry in entries:
-        if entry.get("mode") == mode:
-            key              = entry.get("key", "")
-            url              = entry.get("url", DEFAULT_API_URL)
-            model            = entry.get("model", "claude-opus-4-8")
-            backend          = entry.get("backend", "anthropic")
-            reasoning_budget = int(entry.get("reasoning", 0))
-            temperature      = entry.get("temperature")
-            temperature      = float(temperature) if temperature is not None else None
-            thinking         = entry.get("thinking")
-            ctx_size         = entry.get("ctx_size")
-            kv_cache_type    = entry.get("kv_cache_type")
-            n_parallel       = entry.get("n_parallel")
-            # The key is optional for Ollama/LM Studio (forwarded only if present);
-            # the Anthropic backend always requires one.
-            if not key and backend not in ("ollama", "openai"):
-                sys.exit(f"Mode '{mode}' in env.json has no 'key' field")
-            return (key, url, model, backend, reasoning_budget, temperature,
-                    thinking, ctx_size, kv_cache_type, n_parallel)
-    known = [e.get("mode") for e in entries]
-    sys.exit(f"Mode '{mode}' not found in env.json. Available: {known}")
+    tests/modes.json, with api_key grafted in from tests/env.json when the mode
+    declares one. The last four are None when absent from the entry."""
+    entry            = _load_mode_entry(mode)
+    key              = entry.get("key", "")
+    url              = entry.get("url", DEFAULT_API_URL)
+    model            = entry.get("model", "claude-opus-4-8")
+    backend          = entry.get("backend", "anthropic")
+    reasoning_budget = int(entry.get("reasoning", 0))
+    temperature      = entry.get("temperature")
+    temperature      = float(temperature) if temperature is not None else None
+    thinking         = entry.get("thinking")
+    ctx_size         = entry.get("ctx_size")
+    kv_cache_type    = entry.get("kv_cache_type")
+    n_parallel       = entry.get("n_parallel")
+    # The key is optional for Ollama/LM Studio (forwarded only if present);
+    # the Anthropic backend always requires one -- unless the mode is not an API
+    # mode at all. A runner_type='claude-code' entry names an Anthropic model but
+    # never opens an HTTP connection: the CLI holds the session and authenticates
+    # itself, which is exactly what tests/env.example.json already says about
+    # claude-code-local. Before 2026-08-31 this guard fired on every claude-code
+    # mode that reached it, so campaign._mode_config could not read one at all.
+    if not key and backend not in ("ollama", "openai") and entry.get("runner_type") != "claude-code":
+        sys.exit(f"Mode '{mode}' in env.json has no 'key' field")
+    return (key, url, model, backend, reasoning_budget, temperature,
+            thinking, ctx_size, kv_cache_type, n_parallel)
 
 
 # ---------------------------------------------------------------------------
@@ -975,17 +1089,17 @@ def main(argv=None) -> None:
     p.add_argument("--api-url", default=None,
                    help=f"API base URL [default: {DEFAULT_API_URL} or from --mode]")
     p.add_argument("--mode", default=None,
-                   help="Load api-key, api-url, model, backend from tests/env.json (e.g. claude-api)")
+                   help="Load api-url, model, backend from tests/modes.json and api-key from tests/env.json (e.g. claude-api)")
     p.add_argument("--backend", default=None, choices=["anthropic", "ollama", "openai"],
                    help="Backend: anthropic (default) | ollama | openai (LM Studio). Overrides --mode's backend.")
     p.add_argument("--reasoning", type=int, default=None,
-                   help="Thinking budget in tokens (0 = off). Overrides env.json 'reasoning' field.")
+                   help="Thinking budget in tokens (0 = off). Overrides modes.json 'reasoning' field.")
     p.add_argument("--temperature", type=float, default=None,
-                   help="Sampling temperature. Overrides env.json 'temperature' field. "
+                   help="Sampling temperature. Overrides modes.json 'temperature' field. "
                         "Omitted entirely (provider default) if not set anywhere.")
     p.add_argument("--dry-run", action="store_true",
                    help="Execute and score but do not write any files (probe/debug mode)")
-    p.add_argument("--level", default="L1", choices=["L0", "L1", "L2", "L3", "L4"],
+    p.add_argument("--level", default="L1", choices=list(RENDERINGS),
                    help="Predictability-layer scale for the E0 prompt [default: L1]")
     args = p.parse_args(argv)
 

@@ -11,7 +11,7 @@
     "env_realization": "emulated",
     "predictability_layers": [],
     "runner_type": "api",
-    "api_base_url": "http://ollama-host:11434",
+    "api_base_url": "http://192.168.1.24:11434",
     "backend": "ollama",
     "reasoning_budget": 1
   },

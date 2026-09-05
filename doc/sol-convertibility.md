@@ -26,9 +26,9 @@ This correspondence is complete and unambiguous. There is no SOL construct that 
 
 ---
 
-## Two ready-made converters
+## Three ready-made converters
 
-The `sol-translate` skill ships two Python 3 scripts (no external dependencies):
+The `sol` skill ships three Python 3 scripts (no external dependencies):
 
 ### `sol2mermaid.py` — Mermaid flowchart
 
@@ -67,9 +67,55 @@ After opening the file, apply **Ctrl+Shift+H** (Arrange → Layout → Vertical 
 
 ---
 
+### `sol2prose.py` — narrative prose
+
+Converts a SOL file into a `.prose.md` document: the process restated in plain language in
+execution order — what happens, in what sequence, with which decisions, loops, error paths and
+human gates. It is the inverse of *Pass 0 — Narrative* in the skill's authoring discipline.
+
+```bash
+python3 sol2prose.py process.json               # writes process.prose.md
+python3 sol2prose.py process.json out.md        # custom output path
+python3 sol2prose.py process.json --stdout      # print to stdout
+python3 sol2prose.py process.md                 # renders each json fence in a markdown host
+python3 sol2prose.py process.json --lang it     # scaffolding in Italian (default: en)
+```
+
+Unlike the two diagram converters it also accepts a **markdown host document**, rendering every
+`json` code fence that parses to a SOL object — the json-in-md pattern most real scripts use.
+
+Two rules define what it does and does not do:
+
+- **It never translates.** Only the connective scaffolding (*"For each…"*, *"Otherwise:"*) is
+  templated per language via `--lang`. Every leaf — `TODO` text, `RUN` command, conditions,
+  contract descriptions — is quoted **verbatim**, in whatever language the author wrote it. That
+  is what makes a leaf-by-leaf comparison against the source exact.
+- **It renders, it does not judge.** None of `sol-lint.py`'s rules are reproduced: no severities,
+  no findings, no verdicts. Rendering and linting are separate jobs.
+
+The output surfaces what a flowchart cannot show: the leaf texts themselves, the `accepts` /
+`returns` contracts field by field, the `model` and `role` intent, and every `{{placeholder}}`
+marked as a value that is *not* in the document. A `WHEN` with no `else` is stated as such.
+Because the default output is `<stem>.prose.md` and never `<stem>.md`, running it on a markdown
+host document cannot overwrite the source.
+
+#### Why it exists: round-trip validation
+
+The diagram shows the *shape* of a process; the prose shows its *content*. The intended use is to
+read back, in plain language, what you wrote in JSON, and check that it says what you meant. If
+the narrative reads wrong, the SOL is wrong — fix the script and regenerate. The prose is a
+derived view like the diagrams: never edited by hand.
+
+```
+prose → (the `sol` skill) → SOL → (sol2prose.py) → prose
+```
+
+
+---
+
 ## Color conventions
 
-Both converters use the same semantic color scheme:
+The two diagram converters use the same semantic color scheme:
 
 | Color | Construct |
 |---|---|
@@ -117,15 +163,20 @@ The uppercase keywords (`TODO`, `WHEN`, `ROUTINE`) are intentionally loud — th
 
 ```
 Natural language / pseudocode / YAML / XML
-           ↓  sol-translate skill
-        SOL JSON  (.json)
-           ↓                    ↓
-    sol2mermaid.py         sol2drawio.py
-           ↓                    ↓
-    Mermaid (.mmd)        draw.io (.drawio)
-           ↓                    ↓
-  PNG / SVG / embed      PNG / SVG / PDF / embed
+           ↓  sol skill
+        SOL JSON  (.json / json fence in .md)
+           ↓                 ↓                 ↓
+    sol2mermaid.py      sol2drawio.py      sol2prose.py
+           ↓                 ↓                 ↓
+    Mermaid (.mmd)    draw.io (.drawio)   prose (.prose.md)
+           ↓                 ↓                 ↓
+  PNG / SVG / embed  PNG / SVG / PDF     read it back and
+                                          check it says what
+                                          you meant
 ```
+
+The prose branch closes the loop: the chain now returns to the register it started from, so a
+process can be checked against the intent that produced it.
 
 Each step in this chain is a lossless or near-lossless transformation. The SOL JSON remains the single source of truth; the visual formats are derived views, regeneratable at any time.
 
@@ -133,22 +184,23 @@ Each step in this chain is a lossless or near-lossless transformation. The SOL J
 
 ## Invoking the converters from the skill
 
-When using `/sol-translate`, after generating the SOL files the skill asks:
+When using `/sol`, after generating the SOL files the skill asks:
 
 ```
-SOL files generated. Would you like a diagram? Reply:
+SOL files generated. Would you like a derived view? Reply:
   MERMAID [filename] — Mermaid flowchart (.mmd)
   DRAWIO [filename]  — draw.io XML (.drawio)
-  NO                 — finish without a diagram
+  PROSE [filename]   — narrative rendering (.prose.md)
+  NO                 — finish without one
 ```
 
-Both scripts are also usable standalone, outside the skill, on any SOL JSON file.
+All three scripts are also usable standalone, outside the skill, on any SOL file.
 
 ---
 
 ## Portability guarantees
 
-Both scripts are:
+All three scripts are:
 - **Pure Python 3** — no external packages, no pip install
 - **Self-contained** — a single file, copyable anywhere
 - **Offline** — no network calls, no API keys

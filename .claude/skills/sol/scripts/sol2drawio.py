@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-sol2drawio.py — Convert a SOL 0.5.0 process file to a draw.io XML diagram.
+sol2drawio.py — Convert a SOL 0.6 process file to a draw.io XML diagram.
 
 MIT License
 Copyright (c) 2026 Gianni Tommasi
@@ -19,6 +19,53 @@ import json
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+
+CONSTRAINT_KEYS = ("required", "anyof", "number", "json", "desc")
+
+
+def fmt_value(value) -> str:
+    """A SOL field value as readable text.
+
+    Structured `accepts`/`returns` contracts (SOL 0.6.0), `IMPORT` lists and structured
+    `RETURN` values arrive as dicts/lists. Passing them through `str()` prints a Python
+    repr — `True` instead of `true`, single quotes — so this renders them the way
+    `sol2prose.py` does, keeping the three derived views consistent.
+    """
+    if value is None:
+        return ""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, list):
+        return ", ".join(fmt_value(v) for v in value)
+    if isinstance(value, dict):
+        return "; ".join(f"{k}{fmt_constraints(v)}" for k, v in value.items())
+    return str(value)
+
+
+def fmt_constraints(spec) -> str:
+    """The constraint suffix of one contract field, or the raw value if it is not one."""
+    if not isinstance(spec, dict):
+        return f": {fmt_value(spec)}"
+    if not spec:
+        return ""
+    if not any(k in spec for k in CONSTRAINT_KEYS):
+        return ": " + json.dumps(spec, ensure_ascii=False)
+    parts = []
+    if spec.get("required"):
+        parts.append("required")
+    if "anyof" in spec:
+        parts.append("one of: " + fmt_value(spec["anyof"]))
+    if spec.get("number"):
+        parts.append("numeric")
+    if spec.get("json"):
+        parts.append("json")
+    out = ""
+    if spec.get("desc"):
+        out += f" — {spec['desc']}"
+    if parts:
+        out += f" ({'; '.join(parts)})"
+    return out
 
 
 class Sol2DrawIO:
@@ -149,6 +196,19 @@ class Sol2DrawIO:
         # START
         start_id = self._id("START")
         self._y = self._place_terminal(start_id, f"▶ {self._esc(name)}", cx, self._y)
+
+        # Root contracts (SOL 0.6.0): the outer boundary toward whoever invokes the
+        # process. Placed to the side of START so they do not enter the flow chain.
+        side_y = self._y - self._NH
+        for field in ("accepts", "returns"):
+            if field in sol_doc:
+                info_id = self._id("RC")
+                self._place(info_id, f"{field}: {self._esc(fmt_value(sol_doc[field]), 300)}",
+                            "io", cx + self._HOFF, side_y)
+                self._edge(start_id, info_id, "", dashed=True)
+                side_y += self._NH + 20
+
+        self._y = max(self._y, side_y)
         self._y += self._VGAP
 
         # Routine
@@ -262,7 +322,7 @@ class Sol2DrawIO:
     def _return(self, instr: dict, cx: float) -> tuple[str, str]:
         nid = self._id("RETURN")
         msg = instr.get("RETURN")
-        label = f"↩️ RETURN: {self._esc(str(msg))}" if msg else "↩️ RETURN"
+        label = f"↩️ RETURN: {self._esc(fmt_value(msg), 90)}" if msg else "↩️ RETURN"
         y = self._y
         self._y = self._place(nid, label, "return", cx, y) + self._VGAP
         return nid, nid
@@ -270,7 +330,7 @@ class Sol2DrawIO:
     def _halt(self, instr: dict, cx: float) -> tuple[str, str]:
         nid = self._id("HALT")
         msg = instr.get("HALT")
-        label = f"🛑 HALT: {self._esc(str(msg))}" if msg else "🛑 HALT"
+        label = f"🛑 HALT: {self._esc(fmt_value(msg), 90)}" if msg else "🛑 HALT"
         y = self._y
         self._y = self._place(nid, label, "halt", cx, y) + self._VGAP
         return nid, nid
@@ -284,7 +344,7 @@ class Sol2DrawIO:
 
     def _import(self, instr: dict, cx: float) -> tuple[str, str]:
         nid = self._id("IMP")
-        label = f"IMPORT: {self._esc(instr['IMPORT'])}"
+        label = f"IMPORT: {self._esc(fmt_value(instr['IMPORT']), 90)}"
         y = self._y
         self._y = self._place(nid, label, "import", cx, y) + self._VGAP
         return nid, nid
@@ -292,7 +352,7 @@ class Sol2DrawIO:
     def _unknown(self, instr, cx: float) -> tuple[str, str]:
         nid = self._id("UNK")
         y = self._y
-        self._y = self._place(nid, self._esc(str(instr)), "todo", cx, y) + self._VGAP
+        self._y = self._place(nid, self._esc(fmt_value(instr), 90), "todo", cx, y) + self._VGAP
         return nid, nid
 
     # ------------------------------------------------------------------ control
@@ -407,7 +467,7 @@ class Sol2DrawIO:
         block = instr["REPEAT"]
         for key in ("while", "until", "for", "foreach"):
             if key in block:
-                loop_label = f"{key}: {self._esc(str(block[key]))}"
+                loop_label = f"{key}: {self._esc(fmt_value(block[key]))}"
                 loop_type = key
                 break
         else:
@@ -468,9 +528,9 @@ class Sol2DrawIO:
         name = instr["SPAWN"]
         parts = [f"SPAWN: {self._esc(name)}"]
         if "with" in instr:
-            parts.append(f"with: {self._esc(instr['with'], 35)}")
+            parts.append(f"with: {self._esc(fmt_value(instr['with']), 90)}")
         if "returns" in instr:
-            parts.append(f"returns: {self._esc(instr['returns'], 35)}")
+            parts.append(f"returns: {self._esc(fmt_value(instr['returns']), 90)}")
         label = " | ".join(parts)
         y = self._y
         self._y = self._place(nid, label, "agent", cx, y) + self._VGAP

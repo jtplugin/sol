@@ -16,8 +16,9 @@ what the downstream task is. It supplies clean text, never pre-comprehension
 stop measuring SOL (this is why P2b -- AI that knows the products -- is
 excluded entirely, SS3).
 
-Reuses the same tests/env.json mode convention as the rest of tests/runner/
-(--mode reads key/url/model/backend from tests/env.json) but does NOT touch
+Reuses the same mode convention as the rest of tests/runner/ (--mode reads
+url/model/backend from tests/modes.json and the key, when the backend needs
+one, from tests/env.json) but does NOT touch
 the fixture/runner pipeline: this is a plain text transform, not a SOL
 execution, so it talks to the API directly rather than through
 RunRecord/checker.
@@ -39,7 +40,9 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-ENV_PATH = REPO_ROOT / "tests" / "env.json"
+sys.path.insert(0, str(REPO_ROOT / "tests"))
+
+from runner import api_executor as _api_executor
 
 SYSTEM_PROMPT = (
     "You clean and condense raw software issue-tracker text. Output ONLY the "
@@ -62,14 +65,13 @@ def _approx_tokens(text: str) -> int:
 
 
 def _load_mode(mode: str) -> tuple[str, str, str, str]:
-    if not ENV_PATH.exists():
-        sys.exit(f"env.json not found at {ENV_PATH}")
-    env = json.loads(ENV_PATH.read_text(encoding="utf-8"))
-    for entry in env.get("modes", []):
-        if entry.get("mode") == mode:
-            return entry.get("key", ""), entry.get("url", "https://api.anthropic.com"), \
-                entry.get("model", "claude-opus-4-8"), entry.get("backend", "anthropic")
-    sys.exit(f"Mode '{mode}' not found in env.json")
+    """(key, url, model, backend) for `mode` — a projection over
+    api_executor._load_mode, itself a projection over the single reader of
+    tests/modes.json + tests/env.json. This script needs no more than four
+    fields, but it no longer owns a parser that would silently ignore whatever
+    the mode configuration grows next."""
+    key, url, model, backend, *_ = _api_executor._load_mode(mode)
+    return key, url, model, backend
 
 
 def _condense_one(api_key: str, api_url: str, model: str, title: str, body: str) -> str:
@@ -120,7 +122,7 @@ def process_pool(pool: list[dict], api_key: str, api_url: str, model: str, sleep
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--pool", required=True, type=Path)
-    p.add_argument("--mode", required=True, help="Mode name from tests/env.json")
+    p.add_argument("--mode", required=True, help="Mode name from tests/modes.json")
     p.add_argument("--sleep", type=float, default=0.0, help="Seconds to sleep between calls (rate limiting)")
     p.add_argument("--out", type=Path, default=None)
     p.add_argument("--report", type=Path, default=None)

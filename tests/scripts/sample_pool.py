@@ -12,8 +12,8 @@ both halves keep the repo x label balance, with a SECOND fixed seed.
 
 Outputs:
   - <fixture>/pool-manifest.json   (COMMITTED — zero third-party text: id,
-    repo, nlbse_label, split, hashes, and placeholders for the manual
-    verification)
+    repo, nlbse_label, split, hashes, and placeholders for Gianni's manual
+    verification, item 2.6 of the build plan)
   - data-local/pool-main.json       (LOCAL, gitignored — WITH full text)
   - data-local/pool-replication.json (LOCAL, gitignored — WITH full text;
     SEALED — no analysis script may read this before the MAIN conclusion is

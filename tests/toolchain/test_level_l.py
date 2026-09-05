@@ -4,11 +4,15 @@ R1 tests for the --level scale: T01, T02, T03, T05.
 T01 (FR-01,FR-02,FR-04,FR-08) — --level (choices L0-L4, default L1) accepted
     by run.py and api_executor.py, forwarded through to run_headless_api;
     run.py's claude-code branch stays untouched.
-T02 (FR-03) — _layers_for_level's cumulative mapping.
-T03 (FR-05,FR-09) — _build_prompt_e0 at level=L1 matches the golden capture
-    byte-for-byte; L0/L2/L3/L4 shape.
-T05 (FR-07) — _append_index writes predictability_layers; pre-card index rows
-    without the key stay readable (absence, not error).
+T02 (FR-03) — _normalize_rendering: the cell applied, recorded as a cell.
+T03 (FR-05,FR-09) — _build_prompt_e0 builds the scale of SS5.1: L0 is the task
+    material (input data + SOL script) with no explanatory prose, L1 is L0 plus
+    the minimal instruction verbatim, and the chain is a strict prefix chain
+    from L0 up. Criterion revised by the L-scale realignment: what is asserted is conformity to
+    the protocol, not identity with yesterday's output — a golden capture of the
+    current prompt would have frozen the defect instead of catching it.
+T05 (FR-07) — _append_index writes process_rendering; index rows written before
+    the key existed stay readable (absence, not error).
 """
 import json
 import sys
@@ -25,7 +29,6 @@ import runner.runner as runner_mod
 from runner.schema import Config, Execution, Output, RunRecord, Trace, Usage
 from runner.checker import check
 
-GOLDEN_PATH = REPO_ROOT / "tests" / "toolchain" / "fixtures" / "golden_l1_prompt.txt"
 SUPPORT_INTAKE = "w2-branching/support-intake"
 
 
@@ -114,33 +117,79 @@ def test_api_executor_level_invalid_choice_rejected():
 
 
 # ---------------------------------------------------------------------------
-# T02 — _layers_for_level mapping
+# T02 — _normalize_rendering
 # ---------------------------------------------------------------------------
 
-def test_layers_for_level_cumulative_mapping():
-    assert api_mod._layers_for_level("L0") == []
-    assert api_mod._layers_for_level("L1") == ["L1"]
-    assert api_mod._layers_for_level("L2") == ["L1", "L2"]
-    assert api_mod._layers_for_level("L3") == ["L1", "L2", "L3"]
-    assert api_mod._layers_for_level("L4") == ["L1", "L2", "L3", "L4"]
+def test_normalize_rendering_is_identity_on_every_cell():
+    # SS5.4: seven cells on one selector -- five levels of the L scale plus the
+    # two prose renderings, which replace the SOL document rather than extend it.
+    for cell in ("L0", "L1", "L2", "L3", "L4",
+                 "prose-mechanical", "prose-generated"):
+        assert api_mod._normalize_rendering(cell) == cell
 
 
-def test_layers_for_level_unrecognized_falls_back_to_l1():
-    assert api_mod._layers_for_level("bogus") == api_mod._layers_for_level("L1")
+def test_normalize_rendering_unrecognized_falls_back_to_l1():
+    assert api_mod._normalize_rendering("bogus") == "L1"
+
+
+def test_level_is_recorded_as_a_level_not_as_layer_labels():
+    # After the L-scale realignment: the record used to carry ["L1", "L2"] for level L2 — the labels of
+    # the predictability LAYERS, a different taxonomy that happens to share the
+    # letters. A level is one level.
+    assert api_mod._normalize_rendering("L2") == "L2"
+    assert not hasattr(api_mod, "_LEVEL_LAYERS")
+    assert not hasattr(api_mod, "_layers_for_level")
 
 
 # ---------------------------------------------------------------------------
-# T03 — _build_prompt_e0 shape, byte-for-byte L1 non-regression
+# T03 — _build_prompt_e0 builds the scale the protocol prescribes
 # ---------------------------------------------------------------------------
 
 @pytest.mark.skipif(not _has_hydrated_queues(),
                     reason="queue-*.json not hydrated locally -- run hydrate.py --mode queues")
 class TestBuildPromptE0Levels:
-    def test_l1_matches_golden_byte_for_byte(self):
+    def test_a_prose_rendering_replaces_the_sol_document(self):
+        # SS5.4: prose does not extend the SOL document, it stands in for it.
+        # The task material is still there -- the input is substituted into the
+        # prose document exactly as into the SOL one -- but the script is not.
         sol_doc, bundle, fixture_body = _real_bundle()
-        prompt = api_mod._build_prompt_e0(sol_doc, bundle, fixture_body, level="L1")
-        golden = GOLDEN_PATH.read_text(encoding="utf-8")
-        assert prompt == golden
+        _, _, _, meta = runner_mod._load_fixture(SUPPORT_INTAKE)
+        prompt = api_mod._build_prompt_e0(
+            sol_doc, bundle, fixture_body, level="prose-generated",
+            prose_bodies=meta["prose"])
+        assert '"ROUTINE"' not in prompt
+        assert "{{file_content}}" not in prompt
+        assert json.dumps(bundle.payload, indent=2, ensure_ascii=False) in prompt
+        assert "[fixture-w2-support-intake][main] EVAL:" in prompt
+        assert runner_mod.L1_INSTRUCTION not in prompt
+
+    def test_a_missing_prose_rendering_is_refused_not_downgraded(self):
+        # a silent fallback to the SOL prompt would file a measurement of SOL
+        # under a prose cell, and the failure would be invisible in the data.
+        sol_doc, bundle, fixture_body = _real_bundle()
+        with pytest.raises(FileNotFoundError):
+            api_mod._build_prompt_e0(sol_doc, bundle, fixture_body,
+                                     level="prose-mechanical", prose_bodies={})
+
+    def test_l0_carries_the_task_material_and_no_explanatory_prose(self):
+        sol_doc, bundle, fixture_body = _real_bundle()
+        prompt = api_mod._build_prompt_e0(sol_doc, bundle, fixture_body, level="L0")
+        # the process, and the data the process needs, are present at L0:
+        # subtracting them would not measure context, it would break the task
+        assert "## SOL script" in prompt
+        assert '"ROUTINE"' in prompt
+        assert "## Product catalog" in prompt
+        assert "hours_table" in prompt
+        assert json.dumps(bundle.payload, indent=2, ensure_ascii=False) in prompt
+        assert "{{file_content}}" not in prompt
+        # and nothing that explains how SOL is to be read
+        assert runner_mod.L1_INSTRUCTION not in prompt
+
+    def test_l1_is_exactly_l0_plus_the_minimal_instruction(self):
+        sol_doc, bundle, fixture_body = _real_bundle()
+        l0 = api_mod._build_prompt_e0(sol_doc, bundle, fixture_body, level="L0")
+        l1 = api_mod._build_prompt_e0(sol_doc, bundle, fixture_body, level="L1")
+        assert l1 == l0 + "\n\n" + runner_mod.L1_INSTRUCTION
 
     def test_default_level_is_l1(self):
         sol_doc, bundle, fixture_body = _real_bundle()
@@ -148,19 +197,20 @@ class TestBuildPromptE0Levels:
         l1_prompt = api_mod._build_prompt_e0(sol_doc, bundle, fixture_body, level="L1")
         assert default_prompt == l1_prompt
 
-    def test_l0_is_rendered_file_content_only(self):
-        sol_doc, bundle, fixture_body = _real_bundle()
-        prompt = api_mod._build_prompt_e0(sol_doc, bundle, fixture_body, level="L0")
-        fc = json.dumps(bundle.payload, indent=2, ensure_ascii=False)
-        assert prompt == fc
-        assert "## SOL script" not in prompt
+    def test_minimal_instruction_is_the_protocol_wording(self):
+        # SS5.1, verbatim: the level is defined by this sentence, not by a
+        # paraphrase of it that happens to be in the fixture
+        assert runner_mod.L1_INSTRUCTION == (
+            "follow the algorithm described in the JSON literally")
 
     def test_levels_are_additive_prefix_chain(self):
         sol_doc, bundle, fixture_body = _real_bundle()
+        l0 = api_mod._build_prompt_e0(sol_doc, bundle, fixture_body, level="L0")
         l1 = api_mod._build_prompt_e0(sol_doc, bundle, fixture_body, level="L1")
         l2 = api_mod._build_prompt_e0(sol_doc, bundle, fixture_body, level="L2")
         l3 = api_mod._build_prompt_e0(sol_doc, bundle, fixture_body, level="L3")
         l4 = api_mod._build_prompt_e0(sol_doc, bundle, fixture_body, level="L4")
+        assert l1.startswith(l0) and l1 != l0
         assert l2.startswith(l1) and l2 != l1
         assert l3.startswith(l2) and l3 != l2
         assert l4.startswith(l3) and l4 != l3
@@ -173,15 +223,15 @@ class TestBuildPromptE0Levels:
 
 
 # ---------------------------------------------------------------------------
-# T05 — _append_index writes predictability_layers; old rows stay readable
+# T05 — _append_index writes process_rendering; old rows stay readable
 # ---------------------------------------------------------------------------
 
-def test_append_index_includes_predictability_layers(tmp_path, monkeypatch):
+def test_append_index_includes_process_rendering(tmp_path, monkeypatch):
     monkeypatch.setattr(runner_mod, "RESULTS_DIR", tmp_path)
     monkeypatch.setattr(runner_mod, "INDEX_PATH", tmp_path / "index.jsonl")
 
     config = Config(fixture_id="f", context="E0", model_id="m",
-                    predictability_layers=["L1", "L2"])
+                    process_rendering="L2")
     record = RunRecord(
         run_id="r1", timestamp="2026-01-01T00:00:00+00:00", config=config,
         staged_input_id="i1", execution=Execution(status="done"),
@@ -192,11 +242,11 @@ def test_append_index_includes_predictability_layers(tmp_path, monkeypatch):
 
     lines = (tmp_path / "index.jsonl").read_text(encoding="utf-8").splitlines()
     row = json.loads(lines[-1])
-    assert row["predictability_layers"] == ["L1", "L2"]
+    assert row["process_rendering"] == "L2"
 
 
 def test_pre_card_index_row_without_key_reads_without_error():
-    # 576 rows written before this card carry no predictability_layers key --
-    # reading it back is a plain .get(), never a KeyError (FR-07 note).
+    # rows written before the key existed carry neither process_rendering nor its
+    # predecessor -- reading it back is a plain .get(), never a KeyError (FR-07).
     old_row = json.loads(json.dumps({"run_id": "old", "fixture_id": "f", "status": "done"}))
-    assert old_row.get("predictability_layers") is None
+    assert old_row.get("process_rendering") is None

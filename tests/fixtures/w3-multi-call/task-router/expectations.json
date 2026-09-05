@@ -2,7 +2,7 @@
   "fixture": "fixture-w3-task-router",
   "workload_class": "W3",
   "concern": "multi-call composition — two SUBs produce intermediate classifications, main WHEN routes on their product",
-  "min_environment": "E1",
+  "min_environment": "E0",
   "fidelity_oracle": "last BRANCH trace line in the output — must match the main WHEN branch label (sub-routine BRANCH lines appear first and are informational)",
   "cases": [
     {

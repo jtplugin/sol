@@ -83,6 +83,32 @@ Current line: **0.6** → [spec/sol-0.6.md](spec/sol-0.6.md) (patch version in t
 
 See [doc/DESIGN.md](doc/DESIGN.md) for the reasoning behind every design choice — including a comparison with AWS Strands Agent SOPs and Serverless Workflow.
 
+## Does it actually work?
+
+SOL has been measured, not just argued for. A pre-registered campaign put the same process
+in front of six local models on a single 8 GB GPU and three hosted ones, in seven different
+renderings — the SOL document with increasing amounts of surrounding explanation, and two
+prose translations of it — and asked one question: *under what conditions is a process
+written once actually executed?* 5,421 completed runs, hypotheses deposited before the first
+run, and the git history to prove the plan preceded the results.
+
+The short version: for a commercial model the bare document is enough and adding explanation
+buys nothing. Below that frontier there is no single best form — the best rendering is a
+property of the *(model, task)* pair, and it does not carry over to the next task, which is
+why the answer is a bench rather than a table.
+
+| where to look | what you get |
+|---|---|
+| [`articles/260603_bizanalysis_SOL-orchestrazione/`](articles/260603_bizanalysis_SOL-orchestrazione/) | Three long-form pieces (Italian): what SOL is for, what the numbers say, and fifteen ways a bench flatters whoever built it |
+| [`report/analysis/FACTSHEET.md`](report/analysis/FACTSHEET.md) | Every fact with its N and its interval — generated, not written |
+| [`report/analysis/`](report/analysis/) | The dataset and the notebook: recompute any number yourself |
+| [`doc/experiment-minimum-context.md`](doc/experiment-minimum-context.md) | The pre-registered protocol, amendments included |
+| [`doc/measures.md`](doc/measures.md) | What each number means and how it is computed |
+
+The issue reports the fixtures run on come from a third-party dataset and are not
+redistributed here: the fixtures ship dehydrated, with references, labels and hashes, and
+[`tests/scripts/hydrate.py`](tests/scripts/hydrate.py) rebuilds them from the source.
+
 ## Examples
 
 See [examples/](examples/).

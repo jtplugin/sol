@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 build_verification_html.py — self-contained, offline HTML review tool for
-the manual verification of the sampled pool.
+the manual verification of the item pool (item 2.6 of the build plan).
 
 Reviews only the items actually consumed by the checker: those a model
 classifies before its queue halts, in at least one of the K=10 queues
@@ -88,10 +88,21 @@ def main() -> None:
         print("No Italian translations found (tests/data-local/it-translations.json) -- IT column left empty")
 
     show_all = "--all" in sys.argv
+    repl = "--repl" in sys.argv
 
-    needed_ids = processed_item_ids()
-    print(f"Items actually processed by a model in >=1 queue: {len(needed_ids)}/{len(manifest['items'])} "
-          f"-- restricting review to these (REPLICATION stays sealed, unused MAIN draws stay unverified)")
+    if repl:
+        # SS8.3 step 5: the seal is off. Review the seed-selected candidate set
+        # (select_repl_candidates.py), nothing else -- the selection precedes
+        # the judgment, which is what keeps the two-stage procedure unbiased.
+        cand_path = DATA_LOCAL / "repl-candidates.json"
+        if not cand_path.exists():
+            sys.exit("run select_repl_candidates.py first -- no repl-candidates.json")
+        needed_ids = set(json.loads(cand_path.read_text(encoding="utf-8"))["ids"])
+        print(f"REPLICATION candidates to review: {len(needed_ids)}")
+    else:
+        needed_ids = processed_item_ids()
+        print(f"Items actually processed by a model in >=1 queue: {len(needed_ids)}/{len(manifest['items'])} "
+              f"-- restricting review to these (unused MAIN draws stay unverified)")
 
     items = []
     n_skipped = 0
@@ -129,7 +140,7 @@ def main() -> None:
     data_json = re.sub(r"</(script)", r"<\\/\1", data_json, flags=re.IGNORECASE)
     html = HTML_TEMPLATE.replace("__ITEMS_JSON__", data_json).replace("__N_ITEMS__", str(len(items)))
 
-    out_path = DATA_LOCAL / "verification-sheet.html"
+    out_path = DATA_LOCAL / ("verification-sheet-repl.html" if repl else "verification-sheet.html")
     out_path.write_text(html, encoding="utf-8")
     n_disagree = sum(1 for it in items if it["ai_label"] and it["ai_label"] != it["nlbse_label"])
     print(f"Wrote {out_path} ({len(items)} items, {n_skipped} not needed for this campaign, "
@@ -144,7 +155,7 @@ HTML_TEMPLATE = r"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Verifica manuale pool NLBSE</title>
+<title>Verifica manuale pool NLBSE — item 2.6</title>
 <style>
 :root {
   --bg: #f7f7f5; --panel: #ffffff; --text: #1c1c1c; --muted: #6b6b6b;
@@ -231,7 +242,7 @@ footer.bar {
 <header>
   <div>
     <h1>Verifica manuale pool NLBSE — __N_ITEMS__ item</h1>
-    <div class="sub">solo gli item realmente valutati da almeno una coda (REPLICATION resta sigillata) · autosalva nel browser · niente rete, niente server</div>
+    <div class="sub">item 2.6 · solo gli item realmente valutati da almeno una coda (REPLICATION resta sigillata) · autosalva nel browser · niente rete, niente server</div>
   </div>
   <div class="controls">
     <label>cerca

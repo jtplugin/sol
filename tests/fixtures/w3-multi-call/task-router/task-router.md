@@ -30,10 +30,10 @@ Route the task request by executing the SOL script below strictly.
 ```json
 {
   "ROUTINE": [
-    {"RUN": "cat {{file content}}"},
+    {"RUN": "cat {{record_path}}"},
     {
       "IF": {
-        "when": "file content was not provided, the file could not be read, or effort_days or deadline_days is missing or not a positive integer",
+        "when": "record_path was not provided, the file could not be read, or effort_days or deadline_days is missing or not a positive integer",
         "then": [
           {"TODO": "Emit verbatim: [fixture-w3-task-router][main] BRANCH: branch-guard"},
           {"RETURN": {"verdict": "INVALID_INPUT"}}
@@ -116,9 +116,9 @@ Route the task request by executing the SOL script below strictly.
           ]
         }
       ]
-    }
-	{"TODO":  "Build the result as JSON: {\"verdict\": "{{verdict}}"}. MANDATORY: No other output, **JSON ONLY**, No other fields. Respect exact key casing."},
-	{"RETURN": "{{result}}"}
+    },
+    {"TODO":  "Build the result as JSON: {\"verdict\": \"{{verdict}}\"}. MANDATORY: **JSON ONLY**, no other fields, exact key casing. The BRANCH lines are not part of it."},
+    {"RETURN": "{{result}}"}
   ]
 }
 ```

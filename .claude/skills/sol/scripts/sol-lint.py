@@ -57,6 +57,29 @@ SMELL_PATTERNS = [
     ("sequence", re.compile(r"\bthen\b.*\bthen\b", re.I | re.S)),
 ]
 
+# What follows a buried "if" decides how bad it is. A consequent that transfers
+# control (skip, stop, return...) hides a real branch: the steps after it do not
+# run on that path, and a flowchart drawn from the script shows a straight line
+# where the process actually forks. A consequent that merely assigns a value is
+# a default -- the flow proceeds identically, and in most languages it is a single
+# instruction. Decisione di Gianni (2026-08-20): il ramo va sempre esplicitato; il
+# default si tollera, salvo quando e' l'unica istruzione del suo flusso, perche'
+# allora il diagramma si riduce a una scatola che non rappresenta nulla.
+CONTROL_CONSEQUENT_RE = re.compile(
+    r"\b(skip|ignore|discard|drop|exclude|omit|stop|halt|abort|return|retry|"
+    r"continue|salta|ignora|scarta|escludi|ometti|interrompi|esci|riprova)\b", re.I)
+ASSIGN_CONSEQUENT_RE = re.compile(
+    r"\b(set|assign|use|default to|treat (it )?as|mark (it )?as|imposta|assegna|"
+    r"usa|considera|vale)\b", re.I)
+
+# A RETURN whose whole value is one named placeholder is an indirection to a value
+# built earlier in the script -- not an off-contract literal. Building the object to
+# the contract and then returning a reference to it is good practice: it keeps the
+# shape in one named step instead of inlining it at the exit. Prose-y placeholders
+# ({{the array built earlier}}) deliberately do NOT match -- they stay a finding,
+# and 'vague-placeholder' reports them separately.
+RETURN_REF_RE = re.compile(r"^\s*\{\{\s*([A-Za-z_][\w.\-\[\]']*)\s*\}\}\s*$")
+
 # Identifier-like content inside single braces ⇒ almost certainly a placeholder defect.
 IDENT_RE = r"[A-Za-z_][\w]*(?:[.\[\]'\w-]*)"
 SINGLE_BRACE_RE = re.compile(r"(?<![\$\{])\{(" + IDENT_RE + r")\}(?!\})")
@@ -92,6 +115,15 @@ class SolLinter:
         self._sub_sigs: dict[str, tuple] = {}
         # Structured returns contracts in scope for RETURN shape checks (inner overrides outer).
         self._returns_stack: list[dict] = []
+        # Text used by the RETURN-reference checks (set in lint()).
+        # _doc_json is the whole document: a name may legitimately be bound by
+        # 'accepts' as well as by a step. _body_json is the ROUTINE alone --
+        # contract keys must be searched there, because the 'returns' block
+        # itself names every key and would make the check always pass.
+        self._doc_json = ""
+        self._body_json = ""
+        # Size of the ROUTINE currently being walked, for the buried-flow refinement.
+        self._routine_sizes: list[int] = []
 
     # -- finding helpers ----------------------------------------------------
 
@@ -107,6 +139,9 @@ class SolLinter:
         if not isinstance(doc, dict):
             self.err("$", "root-type", "Root must be a JSON object.")
             return self.findings
+        self._doc_json = json.dumps(doc, ensure_ascii=False)
+        corpo = doc.get("AGENT", doc).get("ROUTINE") if isinstance(doc.get("AGENT", doc), dict) else None
+        self._body_json = json.dumps(corpo, ensure_ascii=False) if corpo is not None else ""
 
         # Unwrap the agent root form: { "AGENT": {...} }
         if set(doc.keys()) == {"AGENT"}:
@@ -179,8 +214,12 @@ class SolLinter:
         if not isinstance(routine, list):
             self.err(path, "routine-type", "ROUTINE must be an array of instructions.")
             return
-        for i, instr in enumerate(routine):
-            self._walk_instruction(instr, f"{path}[{i}]")
+        self._routine_sizes.append(len(routine))
+        try:
+            for i, instr in enumerate(routine):
+                self._walk_instruction(instr, f"{path}[{i}]")
+        finally:
+            self._routine_sizes.pop()
 
     def _walk_instruction(self, instr, path):
         if not isinstance(instr, dict):
@@ -410,6 +449,10 @@ class SolLinter:
         if val is None:
             return
         if isinstance(val, str):
+            m = RETURN_REF_RE.match(val)
+            if m:
+                self._check_return_reference(m.group(1), expected, path)
+                return
             if val.strip():
                 self.warn(path, "return-shape-mismatch",
                           f"RETURN is a string but structured returns expects object keys "
@@ -427,6 +470,41 @@ class SolLinter:
         self.err(path, "return-malformed",
                  f"RETURN must be null, a string, or an object with keys {sorted(expected)}; "
                  f"got {type(val).__name__}.")
+
+    def _mentioned(self, word: str, testo: str) -> int:
+        """How many times `word` occurs as a whole word in `testo`."""
+        return len(re.findall(r"\b" + re.escape(word) + r"\b", testo))
+
+    def _check_return_reference(self, name, expected, path):
+        """RETURN {{name}} is an indirection -- so verify the thing it points at.
+
+        Exempting the reference from 'return-shape-mismatch' would otherwise trade
+        a false positive for a blind spot: nobody would check that the object the
+        script builds actually satisfies the contract. Two textual checks, both on
+        the whole document:
+
+          - the name must be bound somewhere else (the RETURN itself accounts for
+            one occurrence, so a lone hit means nothing ever builds it);
+          - every contract key must appear somewhere in the script, otherwise the
+            step that assembles the payload cannot be producing them.
+
+        Both are heuristics over text, hence WARN: a script can name things in ways
+        a word search misses. They catch the case that matters -- the contract grows
+        a key and the assembling step is never updated.
+        """
+        if not self._doc_json or not self._body_json:
+            return
+        radice = name.split(".")[0].split("[")[0]
+        if self._mentioned(radice, self._doc_json) < 2:
+            self.warn(path, "return-ref-unbound",
+                      f"RETURN points at {{{{{name}}}}} but nothing else in the script "
+                      f"mentions '{radice}' -- no step appears to build it.")
+        assenti = sorted(k for k in expected if not self._mentioned(k, self._body_json))
+        if assenti:
+            self.warn(path, "return-contract-keys-unmentioned",
+                      f"RETURN points at {{{{{name}}}}}, but structured returns keys "
+                      f"{assenti} never appear in the script: the step that assembles "
+                      f"the payload cannot be producing them.")
 
     def _looks_like_guard(self, instr) -> bool:
         if not isinstance(instr, dict):
@@ -448,7 +526,9 @@ class SolLinter:
         # Smell test only on the leaf text fields where prose flow is a defect.
         if field in ("TODO", "RUN"):
             hits = sorted({label for label, rx in SMELL_PATTERNS if rx.search(val)})
-            if hits:
+            if hits == ["decision"]:
+                self._check_buried_decision(val, path, field)
+            elif hits:
                 self.warn(path, "buried-flow",
                           f"{field} text contains control-flow words ({', '.join(hits)}). "
                           f"If this is the program (not a declarative criterion), lift it into a construct.")
@@ -459,6 +539,40 @@ class SolLinter:
                 self.warn(path, "vague-placeholder",
                           f"Placeholder {{{{{inner}}}}} reads as prose, not a named reference. "
                           f"Point it at a named step, loop item, or contract field.")
+
+    def _check_buried_decision(self, val, path, field):
+        """A prose 'if' is graded by what its consequent does (see the constants).
+
+        Control transfer -> 'buried-branch': the steps after it do not run on that
+        path, so a flowchart drawn from the script shows a straight line where the
+        process forks. This one always needs lifting into a construct.
+
+        Assignment -> a defaulted value: the flow proceeds the same either way, and
+        the decision is an internal detail of the step. Reported only when it is the
+        sole instruction of its ROUTINE, because then the diagram is a single box
+        that represents nothing.
+
+        Neither pattern recognised -> the original 'buried-flow', unchanged: when the
+        consequent cannot be read, the conservative call is to still say something.
+        """
+        if CONTROL_CONSEQUENT_RE.search(val):
+            self.warn(path, "buried-branch",
+                      f"{field} text hides a branch: a prose condition whose consequent "
+                      f"transfers control, so the steps that follow do not run on that "
+                      f"path. Lift it into an IF/WHEN -- a flowchart built from this "
+                      f"script cannot show the fork.")
+            return
+        if ASSIGN_CONSEQUENT_RE.search(val):
+            sola = bool(self._routine_sizes) and self._routine_sizes[-1] == 1
+            if sola:
+                self.warn(path, "buried-flow",
+                          f"{field} text buries a condition, and it is the only "
+                          f"instruction of its ROUTINE: the diagram would be a single "
+                          f"box hiding the whole decision. Lift it into a construct.")
+            return
+        self.warn(path, "buried-flow",
+                  f"{field} text contains control-flow words (decision). "
+                  f"If this is the program (not a declarative criterion), lift it into a construct.")
 
     def _check_foreach_collection(self, val, path):
         # Heuristic: if the foreach cites a PascalCase/labelled collection and we have the

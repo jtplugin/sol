@@ -1,0 +1,26 @@
+[
+  {
+    "_comment": "The hosted cells. A separate table from tests/campaign-cells.json on purpose: that file is the frozen GPU grid of the 2026-08-19 revision -- six cells over five ggufs, each carrying the gguf, ctx_size, kv_cache_type and n_parallel a llama-server launch needs -- and tests/toolchain/test_campaign.py asserts exactly that shape, down to the count and to the weights existing on disk. A cell whose model runs on Anthropic's infrastructure has none of those fields and starts no server; filing it in the same table would have turned every one of those assertions into a lie about what the campaign's grid is. A block names the table it reads through `cells_path`, so nothing that ran before this file existed can pick it up by accident. 2026-09-01: two more rows here (sonnet, opus) and the table stopped being a one-cell table -- so every block that reads it now names the single cell it wants through `cells`, exactly as the replication arms do with DECISIVE_CELLS. Without that filter the haiku block would have picked up the two new cells and re-run the arm of 2026-08-31 against a plan that says 280 rows.",
+    "cell": "claude-code-haiku",
+    "runner_type": "claude-code",
+    "modes": [
+      "claude-code-haiku"
+    ]
+  },
+  {
+    "_comment": "2026-09-01, planned before any row ran: the second rung of the hosted ladder. Same fixture, same twenty requests, same seven renderings, same two repetitions, same oracle as the haiku arm -- the model id is the only coordinate that moves. Read tests/modes.json for why there is no key, no url and no llama-server field.",
+    "cell": "claude-code-sonnet",
+    "runner_type": "claude-code",
+    "modes": [
+      "claude-code-sonnet"
+    ]
+  },
+  {
+    "_comment": "2026-09-01, planned before any row ran: the third rung. See claude-code-sonnet.",
+    "cell": "claude-code-opus",
+    "runner_type": "claude-code",
+    "modes": [
+      "claude-code-opus"
+    ]
+  }
+]

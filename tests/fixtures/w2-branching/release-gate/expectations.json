@@ -2,7 +2,7 @@
   "fixture": "fixture-w2-release-gate",
   "workload_class": "W2",
   "concern": "branch selection (control-flow fidelity)",
-  "min_environment": "E1",
+  "min_environment": "E0",
   "fidelity_oracle": "the value of returns.verdict identifies which branch executed (quality oracle); the BRANCH trace line identifies it independently (fidelity oracle). verdict == expected_verdict AND trace_branch_label == observed_branch together prove the right branch ran.",
   "cases": [
     {

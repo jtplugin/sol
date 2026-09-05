@@ -10,7 +10,7 @@ iterated.
 
 Each W2 concern is its own fixture, to stay single-concern:
 
-- [[release-gate.mmd]] — **branch selection** (built). The returned verdict reveals
+- [`release-gate`](release-gate/) — **branch selection** (built). The returned verdict reveals
   which branch executed.
 -  _loop coverage_ — `REPEAT foreach` over a known collection (not yet authored).
 - _`SUB`/`CALL`_ — shared-context subroutine invocation (not yet authored).

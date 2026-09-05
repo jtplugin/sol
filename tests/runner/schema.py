@@ -20,7 +20,22 @@ class Config:
     sol_variant: str = "standard"
     interactive: bool = False
     env_realization: str = "emulated"   # native | emulated
-    predictability_layers: list = field(default_factory=list)
+    process_rendering: str = ""         # how the process was put in front of the
+                                        # model: L0..L4 (the SOL document at a
+                                        # collateral level, SS5.1) or one of the two
+                                        # prose renderings of SS5.4. One selector,
+                                        # seven values, NOT a grid -- SS5.1 applies to
+                                        # SOL only and SS5.4 does not apply to SOL, so
+                                        # the two factors never cross. The seven do not
+                                        # sit on one axis either: five form a prefix
+                                        # chain, two are comparison points against it.
+    mode: str = ""                      # name of the tests/modes.json entry this run
+                                        # came from. model_id does not stand in for it:
+                                        # qwen3.5-9b think and nothink are the same
+                                        # gguf and differ only by `thinking`, which
+                                        # other models carry set without it meaning
+                                        # anything. Empty on runs recorded before the
+                                        # field existed -- absent, not inferred.
     runner_type: str = "claude-code"    # "claude-code" | "api"
     api_base_url: Optional[str] = None  # set only for runner_type="api"
     backend: str = "anthropic"          # "anthropic" | "ollama" | "openai" (runner_type="api")
@@ -38,6 +53,11 @@ class Execution:
     wall_clock_ms: Optional[int] = None
     na_reason: Optional[str] = None
     error_detail: Optional[str] = None
+    stop_reason: Optional[str] = None   # why generation ended, as the provider
+                                        # reports it ("stop" | "length" | ...).
+                                        # A run that hit the token ceiling and one
+                                        # that chose to stop are different events
+                                        # and used to be indistinguishable on disk.
 
 
 @dataclass
@@ -52,8 +72,18 @@ class Trace:
 
 @dataclass
 class Output:
-    raw: str = ""
+    raw: str = ""                       # what the model returned as its answer
     returned_payload: Optional[Any] = None
+    reasoning: str = ""                 # the thinking block, when the provider
+                                        # hands it back separately. NOT part of
+                                        # the answer and never scored: the SOL
+                                        # contract asks for the payload, and
+                                        # deliberating is not delivering. Kept
+                                        # because without it a thinking model that
+                                        # spends its whole budget and returns an
+                                        # empty `content` is recorded as having
+                                        # produced nothing at all -- which says
+                                        # more about the reader than the model.
 
 
 @dataclass
@@ -162,7 +192,7 @@ class ScoreRecord:
     efficiency: EfficiencyRecord
     # Categorical: none | wrong-value | no-output | refused |
     #              garbled-output | execution-error | timeout | connection-error | na |
-    #              partial-sequence | no-halt | budget-drift
+    #              partial-sequence | halt-not-taken | no-halt | budget-drift
     degradation_mode: str
     # Domain comprehension (product+intent vs ground truth), independent of
     # SOL control-flow. None for fixtures without a comprehension oracle.

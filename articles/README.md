@@ -3,8 +3,8 @@
 This folder contains articles, posts, and editorial content about SOL.
 
 ## Serie in corso
-- [[articles/260528_Linkedin_Presentazione/abstract|Presentazione Linkedin]]
-- [[articles/260603_bizanalysis_SOL-orchestrazione/abstract|Articolo su Bizanalysis]]
+- [Presentazione Linkedin](260528_Linkedin_Presentazione/abstract.md)
+- [Articolo su Bizanalysis](260603_bizanalysis_SOL-orchestrazione/abstract.md)
 
 ## Structure
 

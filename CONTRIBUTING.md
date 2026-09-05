@@ -22,7 +22,7 @@ SOL is a spec project. Contributions can be:
 ## Before opening a PR
 
 1. Open an issue first for anything that changes the spec.
-2. Read [DESIGN.md](doc/DESIGN.md) — many "why not X" questions are answered there.
+2. Read [`doc/DESIGN.md`](doc/DESIGN.md) — many "why not X" questions are answered there.
 3. Proposals for new instructions should include: motivation, example, and edge case analysis.
 
 ## Versioning

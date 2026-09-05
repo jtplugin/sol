@@ -1,0 +1,11 @@
+{
+  "item": {
+    "id": "x1",
+    "title": "Crash when opening a large project folder"
+  },
+  "teams": {
+    "T1": "OPEN",
+    "T2": "OPEN",
+    "T3": "OPEN"
+  }
+}

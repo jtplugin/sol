@@ -164,7 +164,7 @@ Every runner writes this, regardless of backend. Fields absent from a context ar
 run_id, timestamp
 config:    { fixture_id, spec_version, sol_variant,
              context (E0|E1|E2|E2+), interactive (bool), env_realization (native|emulated),
-             model_id, predictability_layers[] }
+             model_id, process_rendering (L0..L4 | prose-*) }
 input:     { staged_input_id }                         # never the expected result
 execution: { status (done|error|na), wall_clock_ms }
 trace:     { steps[],            # parsed "[<case>][<agent>] <action>" spine

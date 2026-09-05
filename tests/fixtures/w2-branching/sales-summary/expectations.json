@@ -1,0 +1,170 @@
+{
+  "fixture": "fixture-w2-sales-summary",
+  "cases": [
+    {
+      "input": "inputs/i1-simple",
+      "expected_output": {
+        "total": 223,
+        "count": 4
+      },
+      "expected_sequence": [
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count"
+      ]
+    },
+    {
+      "input": "inputs/i2-formats",
+      "expected_output": {
+        "total": 398,
+        "count": 5
+      },
+      "expected_sequence": [
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count"
+      ]
+    },
+    {
+      "input": "inputs/i3-corrections",
+      "expected_output": {
+        "total": 165,
+        "count": 3
+      },
+      "expected_sequence": [
+        "branch-cancelled",
+        "branch-count",
+        "branch-cancelled",
+        "branch-count",
+        "branch-count"
+      ]
+    },
+    {
+      "input": "inputs/i4-complex",
+      "expected_output": {
+        "total": 434,
+        "count": 6
+      },
+      "expected_sequence": [
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count"
+      ]
+    },
+    {
+      "input": "inputs/i5-bulk",
+      "expected_output": {
+        "total": 2500,
+        "count": 100
+      },
+      "expected_sequence": [
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count",
+        "branch-count"
+      ]
+    }
+  ]
+}

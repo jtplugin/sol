@@ -1,0 +1,186 @@
+{
+  "run_id": "w2-branching-support-intake-queue-01-20260819T051205-r01",
+  "timestamp": "2026-08-19T05:12:05.306964+00:00",
+  "config": {
+    "fixture_id": "w2-branching/support-intake",
+    "context": "E0",
+    "model_id": "ai-models/Ministral-3-8B-Instruct-2512-Q4_K_M.gguf",
+    "spec_version": "0.6",
+    "sol_variant": "standard",
+    "interactive": false,
+    "env_realization": "emulated",
+    "predictability_layers": [],
+    "runner_type": "api",
+    "api_base_url": "http://localhost:8090",
+    "backend": "openai",
+    "reasoning_budget": 0,
+    "temperature": 0.2
+  },
+  "staged_input_id": "queue-01",
+  "execution": {
+    "status": "done",
+    "wall_clock_ms": 59857,
+    "na_reason": null,
+    "error_detail": null
+  },
+  "trace": {
+    "steps": [
+      "[fixture-w2-support-intake][main] EVAL: item=item-241 product=P5 intent=BUG",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-241 action=ASSIGN remaining=17",
+      "[fixture-w2-support-intake][main] EVAL: item=item-095 product=P2 intent=FEATURE",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-095 action=DEFER remaining=17",
+      "[fixture-w2-support-intake][main] EVAL: item=item-299 product=P5 intent=QUESTION",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-299 action=ASSIGN remaining=16",
+      "[fixture-w2-support-intake][main] EVAL: item=item-156 product=P1 intent=FEATURE",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-156 action=DEFER remaining=16",
+      "[fixture-w2-support-intake][main] EVAL: item=item-105 product=P2 intent=BUG",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-105 action=DEFER remaining=16",
+      "[fixture-w2-support-intake][main] EVAL: item=item-210 product=P4 intent=FEATURE",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-210 action=DEFER remaining=16",
+      "[fixture-w2-support-intake][main] EVAL: item=item-137 product=P3 intent=BUG",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-137 action=DEFER remaining=16",
+      "[fixture-w2-support-intake][main] EVAL: item=item-275 product=P5 intent=FEATURE",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-275 action=DEFER remaining=16",
+      "[fixture-w2-support-intake][main] EVAL: item=item-128 product=P3 intent=BUG",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-128 action=DEFER remaining=16",
+      "[fixture-w2-support-intake][main] EVAL: item=item-254 product=P5 intent=BUG",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-254 action=ESCALATE remaining=16",
+      "[fixture-w2-support-intake][main] EVAL: item=item-181 product=P4 intent=BUG",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-181 action=DEFER remaining=16",
+      "[fixture-w2-support-intake][main] EVAL: item=item-213 product=P4 intent=FEATURE",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-213 action=DEFER remaining=16",
+      "[fixture-w2-support-intake][main] EVAL: item=item-271 product=P5 intent=FEATURE",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-271 action=DEFER remaining=16",
+      "[fixture-w2-support-intake][main] EVAL: item=item-109 product=P2 intent=QUESTION",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-109 action=DEFER remaining=16",
+      "[fixture-w2-support-intake][main] EVAL: item=item-160 product=P3 intent=FEATURE",
+      "[fixture-w2-support-intake][main] BRANCH: item=item-160 action=DEFER remaining=16"
+    ],
+    "tool_calls": [],
+    "boundaries": [],
+    "per_call_model": [],
+    "request_messages": [],
+    "request_messages_note": "The administered prompt embedded third-party issue reports and is not redistributed. Rebuild it with tests/scripts/hydrate.py plus the source dataset."
+  },
+  "output": {
+    "raw": "```json\n{\n  \"status\": \"OK\",\n  \"items\": [\n    {\n      \"id\": \"item-241\",\n      \"product\": \"P5\",\n      \"intent\": \"BUG\",\n      \"hours\": 3,\n      \"action\": \"ASSIGN\"\n    },\n    {\n      \"id\": \"item-095\",\n      \"product\": \"P2\",\n      \"intent\": \"FEATURE\",\n      \"hours\": 4,\n      \"action\": \"DEFER\"\n    },\n    {\n      \"id\": \"item-299\",\n      \"product\": \"P5\",\n      \"intent\": \"QUESTION\",\n      \"hours\": 1,\n      \"action\": \"ASSIGN\"\n    },\n    {\n      \"id\": \"item-156\",\n      \"product\": \"P1\",\n      \"intent\": \"FEATURE\",\n      \"hours\": 5,\n      \"action\": \"DEFER\"\n    },\n    {\n      \"id\": \"item-105\",\n      \"product\": \"P2\",\n      \"intent\": \"BUG\",\n      \"hours\": 2,\n      \"action\": \"DEFER\"\n    },\n    {\n      \"id\": \"item-210\",\n      \"product\": \"P4\",\n      \"intent\": \"FEATURE\",\n      \"hours\": 5,\n      \"action\": \"DEFER\"\n    },\n    {\n      \"id\": \"item-137\",\n      \"product\": \"P3\",\n      \"intent\": \"BUG\",\n      \"hours\": 2,\n      \"action\": \"DEFER\"\n    },\n    {\n      \"id\": \"item-275\",\n      \"product\": \"P5\",\n      \"intent\": \"FEATURE\",\n      \"hours\": 5,\n      \"action\": \"DEFER\"\n    },\n    {\n      \"id\": \"item-128\",\n      \"product\": \"P3\",\n      \"intent\": \"BUG\",\n      \"hours\": 2,\n      \"action\": \"DEFER\"\n    },\n    {\n      \"id\": \"item-254\",\n      \"product\": \"P5\",\n      \"intent\": \"BUG\",\n      \"hours\": 3,\n      \"action\": \"ESCALATE\"\n    },\n    {\n      \"id\": \"item-181\",\n      \"product\": \"P4\",\n      \"intent\": \"BUG\",\n      \"hours\": 3,\n      \"action\": \"DEFER\"\n    },\n    {\n      \"id\": \"item-213\",\n      \"product\": \"P4\",\n      \"intent\": \"FEATURE\",\n      \"hours\": 5,\n      \"action\": \"DEFER\"\n    },\n    {\n      \"id\": \"item-271\",\n      \"product\": \"P5\",\n      \"intent\": \"FEATURE\",\n      \"hours\": 5,\n      \"action\": \"DEFER\"\n    },\n    {\n      \"id\": \"item-109\",\n      \"product\": \"P2\",\n      \"intent\": \"QUESTION\",\n      \"hours\": 1,\n      \"action\": \"DEFER\"\n    },\n    {\n      \"id\": \"item-160\",\n      \"product\": \"P3\",\n      \"intent\": \"FEATURE\",\n      \"hours\": 4,\n      \"action\": \"DEFER\"\n    }\n  ],\n  \"remaining_hours\": 2,\n  \"halted_at\": \"item-254\"\n}\n```\n\n### Emit Verbose Logs:\n\n```\n[fixture-w2-support-intake][main] EVAL: item=item-241 product=P5 intent=BUG\n[fixture-w2-support-intake][main] BRANCH: item=item-241 action=ASSIGN remaining=17\n\n[fixture-w2-support-intake][main] EVAL: item=item-095 product=P2 intent=FEATURE\n[fixture-w2-support-intake][main] BRANCH: item=item-095 action=DEFER remaining=17\n\n[fixture-w2-support-intake][main] EVAL: item=item-299 product=P5 intent=QUESTION\n[fixture-w2-support-intake][main] BRANCH: item=item-299 action=ASSIGN remaining=16\n\n[fixture-w2-support-intake][main] EVAL: item=item-156 product=P1 intent=FEATURE\n[fixture-w2-support-intake][main] BRANCH: item=item-156 action=DEFER remaining=16\n\n[fixture-w2-support-intake][main] EVAL: item=item-105 product=P2 intent=BUG\n[fixture-w2-support-intake][main] BRANCH: item=item-105 action=DEFER remaining=16\n\n[fixture-w2-support-intake][main] EVAL: item=item-210 product=P4 intent=FEATURE\n[fixture-w2-support-intake][main] BRANCH: item=item-210 action=DEFER remaining=16\n\n[fixture-w2-support-intake][main] EVAL: item=item-137 product=P3 intent=BUG\n[fixture-w2-support-intake][main] BRANCH: item=item-137 action=DEFER remaining=16\n\n[fixture-w2-support-intake][main] EVAL: item=item-275 product=P5 intent=FEATURE\n[fixture-w2-support-intake][main] BRANCH: item=item-275 action=DEFER remaining=16\n\n[fixture-w2-support-intake][main] EVAL: item=item-128 product=P3 intent=BUG\n[fixture-w2-support-intake][main] BRANCH: item=item-128 action=DEFER remaining=16\n\n[fixture-w2-support-intake][main] EVAL: item=item-254 product=P5 intent=BUG\n[fixture-w2-support-intake][main] BRANCH: item=item-254 action=ESCALATE remaining=16\n\n[fixture-w2-support-intake][main] EVAL: item=item-181 product=P4 intent=BUG\n[fixture-w2-support-intake][main] BRANCH: item=item-181 action=DEFER remaining=16\n\n[fixture-w2-support-intake][main] EVAL: item=item-213 product=P4 intent=FEATURE\n[fixture-w2-support-intake][main] BRANCH: item=item-213 action=DEFER remaining=16\n\n[fixture-w2-support-intake][main] EVAL: item=item-271 product=P5 intent=FEATURE\n[fixture-w2-support-intake][main] BRANCH: item=item-271 action=DEFER remaining=16\n\n[fixture-w2-support-intake][main] EVAL: item=item-109 product=P2 intent=QUESTION\n[fixture-w2-support-intake][main] BRANCH: item=item-109 action=DEFER remaining=16\n\n[fixture-w2-support-intake][main] EVAL: item=item-160 product=P3 intent=FEATURE\n[fixture-w2-support-intake][main] BRANCH: item=item-160 action=DEFER remaining=16\n```\n\n### Explanation of Classifications:\n\n1. **item-241**: Matches **Tensora** (P5) due to TensorFlow-related issues and GPU/accelerator support.\n2. **item-095**: Matches **Lucent** (P2) due to JavaScript scheduling callbacks.\n3. **item-299**: Matches **Tensora** (P5) due to distributed training and model parallelism.\n4. **item-156**: Matches **Solidus** (P1) due to password storage, though it could be a stretch; no better match found.\n5. **item-105**: Matches **Lucent** (P2) due to DOM event handling and React.\n6. **item-210**: Matches **Aperture** (P4) due to OpenCV module management and Windows-specific build flags.\n7. **item-137**: Matches **Meridian** (P3) due to VS Code and Linux-related forwarding issues.\n8. **item-275**: Matches **Tensora** (P5) due to TensorFlow and tensor operations.\n9. **item-128**: Matches **Meridian** (P3) due to VS Code UI issue.\n10. **item-254**: Matches **Tensora** (P5) due to TensorFlow-related build errors, but budget exhausted for BUGs in P5.\n11. **item-181**: Matches **Aperture** (P4) due to OpenCV and X86 winograd.\n12. **item-213**: Matches **Aperture** (P4) due to OpenVINO backend implementation.\n13. **item-271**: Matches **Tensora** (P5) due to TensorFlow Lite and Flex delegate.\n14. **item-109**: Matches **Lucent** (P2) due to React mixin rewrite.\n15. **item-160**: Matches **Meridian** (P3) due to VS Code UI accessibility feature request.\n\nThe budget was exhausted for BUGs in **Tensora** (P5) after item-241 and item-254, hence item-254 was escalated.",
+    "returned_payload": {
+      "status": "OK",
+      "items": [
+        {
+          "id": "item-241",
+          "product": "P5",
+          "intent": "BUG",
+          "hours": 3,
+          "action": "ASSIGN"
+        },
+        {
+          "id": "item-095",
+          "product": "P2",
+          "intent": "FEATURE",
+          "hours": 4,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-299",
+          "product": "P5",
+          "intent": "QUESTION",
+          "hours": 1,
+          "action": "ASSIGN"
+        },
+        {
+          "id": "item-156",
+          "product": "P1",
+          "intent": "FEATURE",
+          "hours": 5,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-105",
+          "product": "P2",
+          "intent": "BUG",
+          "hours": 2,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-210",
+          "product": "P4",
+          "intent": "FEATURE",
+          "hours": 5,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-137",
+          "product": "P3",
+          "intent": "BUG",
+          "hours": 2,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-275",
+          "product": "P5",
+          "intent": "FEATURE",
+          "hours": 5,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-128",
+          "product": "P3",
+          "intent": "BUG",
+          "hours": 2,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-254",
+          "product": "P5",
+          "intent": "BUG",
+          "hours": 3,
+          "action": "ESCALATE"
+        },
+        {
+          "id": "item-181",
+          "product": "P4",
+          "intent": "BUG",
+          "hours": 3,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-213",
+          "product": "P4",
+          "intent": "FEATURE",
+          "hours": 5,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-271",
+          "product": "P5",
+          "intent": "FEATURE",
+          "hours": 5,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-109",
+          "product": "P2",
+          "intent": "QUESTION",
+          "hours": 1,
+          "action": "DEFER"
+        },
+        {
+          "id": "item-160",
+          "product": "P3",
+          "intent": "FEATURE",
+          "hours": 4,
+          "action": "DEFER"
+        }
+      ],
+      "remaining_hours": 2,
+      "halted_at": "item-254"
+    }
+  },
+  "usage": {
+    "tokens_in": 17467,
+    "tokens_out": 2140,
+    "cost": null,
+    "sub_agent_count": null
+  }
+}
